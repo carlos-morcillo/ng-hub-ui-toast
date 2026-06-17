@@ -1,60 +1,121 @@
 # ng-hub-ui-toast
 
+**Español** | [English](./README.md)
+
 [![NPM Version](https://img.shields.io/npm/v/ng-hub-ui-toast.svg)](https://www.npmjs.com/package/ng-hub-ui-toast)
 [![Angular](https://img.shields.io/badge/Angular-22-red.svg)](https://angular.dev)
 [![License](https://img.shields.io/npm/l/ng-hub-ui-toast.svg)](LICENSE)
 
-> Servicio de notificaciones toast para Angular 22 standalone, construido sobre Signals — parte del ecosistema [ng-hub-ui](https://hubui.dev/).
+Servicio de notificaciones toast para Angular 22 standalone — API imperativa, observables de ciclo de vida, barra de progreso, seis posiciones y tematización completa con CSS variables. Sin dependencias externas.
 
-## Características
+## Documentación y ejemplos en vivo
 
-- **Stack basado en signals** — los toasts activos viven en un `signal<HubToastData[]>`; compatible con `OnPush` y apps sin zones.
-- **Montaje lazy del contenedor** — `ToastContainerComponent` se añade a `document.body` solo en la primera llamada; nada se ejecuta al arrancar.
-- **`HubToastRef`** — cada llamada devuelve una referencia con observables `onShown`, `onHidden`, `onTap` y los métodos `manualClose()` / `resetTimeout()`.
-- **Overrides por llamada** — define valores por defecto globales con `provideToast()` y sobreescríbelos individualmente en cada llamada.
-- **Seis posiciones** — `toast-top-right`, `toast-top-left`, `toast-top-center`, `toast-bottom-right`, `toast-bottom-left`, `toast-bottom-center`.
-- **Barra de progreso y botón de cierre** — controles de dismiss configurables.
-- **Tematización con CSS variables** — cada color, radio, sombra y dimensión es un token `--hub-toast-*`.
-- **Tipos semánticos integrados** — `success`, `error`, `warning`, `info` heredan cada uno la familia de acento `--hub-sys-color-*` correspondiente del Design System.
+Este paquete es parte de [Hub UI](https://hubui.dev/), una colección de bibliotecas de componentes Angular para apps standalone.
 
-## Instalación
+- Docs: https://hubui.dev/toast/overview/
+- Ejemplos en vivo: https://hubui.dev/toast/examples/
+- Hub UI: https://hubui.dev/
+
+## 🧩 Familia de bibliotecas `ng-hub-ui`
+
+Esta biblioteca forma parte del ecosistema **ng-hub-ui**:
+
+- [**ng-hub-ui-accordion**](https://www.npmjs.com/package/ng-hub-ui-accordion) _(obsoleta → usa panels)_
+- [**ng-hub-ui-action-sheet**](https://www.npmjs.com/package/ng-hub-ui-action-sheet)
+- [**ng-hub-ui-avatar**](https://www.npmjs.com/package/ng-hub-ui-avatar)
+- [**ng-hub-ui-board**](https://www.npmjs.com/package/ng-hub-ui-board)
+- [**ng-hub-ui-breadcrumbs**](https://www.npmjs.com/package/ng-hub-ui-breadcrumbs)
+- [**ng-hub-ui-calendar**](https://www.npmjs.com/package/ng-hub-ui-calendar)
+- [**ng-hub-ui-dropdown**](https://www.npmjs.com/package/ng-hub-ui-dropdown)
+- [**ng-hub-ui-forms**](https://www.npmjs.com/package/ng-hub-ui-forms)
+- [**ng-hub-ui-history**](https://www.npmjs.com/package/ng-hub-ui-history)
+- [**ng-hub-ui-milestones**](https://www.npmjs.com/package/ng-hub-ui-milestones)
+- [**ng-hub-ui-modal**](https://www.npmjs.com/package/ng-hub-ui-modal)
+- [**ng-hub-ui-nav**](https://www.npmjs.com/package/ng-hub-ui-nav)
+- [**ng-hub-ui-paginable**](https://www.npmjs.com/package/ng-hub-ui-paginable)
+- [**ng-hub-ui-panels**](https://www.npmjs.com/package/ng-hub-ui-panels)
+- [**ng-hub-ui-portal**](https://www.npmjs.com/package/ng-hub-ui-portal)
+- [**ng-hub-ui-skeleton**](https://www.npmjs.com/package/ng-hub-ui-skeleton)
+- [**ng-hub-ui-sortable**](https://www.npmjs.com/package/ng-hub-ui-sortable)
+- [**ng-hub-ui-stepper**](https://www.npmjs.com/package/ng-hub-ui-stepper)
+- [**ng-hub-ui-toast**](https://www.npmjs.com/package/ng-hub-ui-toast) ← Estás aquí
+- [**ng-hub-ui-utils**](https://www.npmjs.com/package/ng-hub-ui-utils)
+
+---
+
+## 🚀 Inicio rápido
+
+### 1. Instalar
 
 ```bash
 npm install ng-hub-ui-toast
 ```
 
-## Inicio rápido
+> **Tematización (recomendado):** instala los tokens de diseño compartidos para que los toasts — y todas las demás bibliotecas ng-hub-ui — usen la misma paleta y modo oscuro:
+>
+> ```bash
+> npm install ng-hub-ui-ds
+> ```
+> ```css
+> @import 'ng-hub-ui-ds/styles/tokens/hub-tokens.css';
+> ```
+>
+> Es una dependencia entre pares **opcional**: el servicio incluye fallbacks CSS sensatos y funciona sin ella.
+
+### 2. Registrar el provider
 
 ```typescript
 // app.config.ts
 import { provideToast } from 'ng-hub-ui-toast';
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    provideToast({ progressBar: true, timeOut: 4000 })
-  ]
+    providers: [
+        provideToast({ progressBar: true, timeOut: 4000 })
+    ]
 };
 ```
 
+### 3. Inyectar y llamar
+
 ```typescript
-// cualquier componente o servicio
 import { ToastService } from 'ng-hub-ui-toast';
 
 @Component({ ... })
 export class SaveComponent {
-  private toast = inject(ToastService);
+    private toast = inject(ToastService);
 
-  save() {
-    this.toast.success('Registro guardado.', 'Éxito');
-  }
+    save() {
+        this.toast.success('Registro guardado.', 'Éxito');
+    }
 }
 ```
 
-## API
+---
+
+## 📦 Descripción
+
+`ng-hub-ui-toast` es un servicio de notificaciones sin dependencias externas para Angular 22+ standalone. Llama a `ToastService.success()`, `.error()`, `.warning()` o `.info()` desde cualquier componente o servicio; el contenedor overlay se monta de forma lazy la primera vez que se lanza una notificación. Cada llamada devuelve un `HubToastRef` con observables `onShown`, `onHidden` y `onTap`, más `manualClose()` / `resetTimeout()`.
+
+## 🎯 Características
+
+- **Stack basado en signals** — la lista de toasts activos es un `signal<HubToastData[]>`; compatible con `OnPush` y apps sin zones.
+- **Montaje lazy del contenedor** — `ToastContainerComponent` se añade a `document.body` solo en la primera llamada; nada se ejecuta al arrancar.
+- **`HubToastRef`** — observables de ciclo de vida (`onShown`, `onHidden`, `onTap`) y control imperativo (`manualClose()`, `resetTimeout()`).
+- **Overrides por llamada** — define valores globales con `provideToast()` y sobreescríbelos individualmente en cada llamada.
+- **Seis posiciones** — superior/inferior × derecha/izquierda/centro.
+- **Barra de progreso y botón de cierre** — controles de dismiss configurables.
+- **Tematización con CSS variables** — cada color, radio, sombra y dimensión es un token `--hub-toast-*`.
+- **Tipos semánticos integrados** — `success`, `error`, `warning`, `info` resuelven automáticamente la familia de acento `--hub-sys-color-*` del DS.
+- **Tipos personalizados** — pasa cualquier string a `show()` y controla el acento con tu propio `--hub-toast-accent`.
+- **Capacidad y deduplicación** — `maxOpened` limita el stack; `autoDismiss` elimina el más antiguo; `preventDuplicates` silencia duplicados.
+
+---
+
+## ⚙️ Configuración
 
 ### `provideToast(config?)`
 
-Se llama una vez en `ApplicationConfig.providers`. Todas las opciones son opcionales.
+Todas las opciones son opcionales y se fusionan sobre los valores por defecto integrados.
 
 | Opción | Tipo | Por defecto | Descripción |
 |---|---|---|---|
@@ -69,6 +130,10 @@ Se llama una vez en `ApplicationConfig.providers`. Todas las opciones son opcion
 | `maxOpened` | `number` | `0` | Máximo de toasts simultáneos (`0` = ilimitado). |
 | `autoDismiss` | `boolean` | `false` | Eliminar el más antiguo cuando se alcanza `maxOpened`. |
 | `preventDuplicates` | `boolean` | `false` | Ignorar nuevos toasts con un mensaje ya visible. |
+
+---
+
+## 🪄 Referencia de API
 
 ### `ToastService`
 
@@ -87,12 +152,12 @@ Se llama una vez en `ApplicationConfig.providers`. Todas las opciones son opcion
 
 ```typescript
 interface HubToastRef {
-  readonly toastId: number;
-  readonly onShown:  Observable<void>;   // emite una vez cuando el toast entra en el DOM
-  readonly onHidden: Observable<void>;   // emite una vez cuando el toast sale del DOM
-  readonly onTap:    Observable<void>;   // emite cada vez que el usuario hace click
-  manualClose(): void;                   // elimina inmediatamente
-  resetTimeout(): void;                  // reinicia el temporizador de auto-dismiss
+    readonly toastId: number;
+    readonly onShown:  Observable<void>;   // emite una vez cuando el toast entra en el DOM
+    readonly onHidden: Observable<void>;   // emite una vez cuando el toast sale del DOM
+    readonly onTap:    Observable<void>;   // emite cada vez que el usuario hace click
+    manualClose(): void;                   // elimina inmediatamente
+    resetTimeout(): void;                  // reinicia el temporizador de auto-dismiss
 }
 ```
 
@@ -104,11 +169,10 @@ const ref = this.toast.success('Carga completada', 'Listo', { timeOut: 0 });
 ref.onTap.subscribe(() => this.router.navigate(['/uploads']));
 ref.onHidden.subscribe(() => console.log('toast cerrado'));
 
-// cerrar programáticamente
-someButton.addEventListener('click', () => ref.manualClose());
+closeBtn.addEventListener('click', () => ref.manualClose());
 ```
 
-## Posiciones
+### Posiciones
 
 | Clase | Ubicación |
 |---|---|
@@ -120,13 +184,14 @@ someButton.addEventListener('click', () => ref.manualClose());
 | `toast-bottom-center` | Centro inferior |
 
 ```typescript
-// override por llamada
 this.toast.info('Mensaje', '', { positionClass: 'toast-bottom-center' });
 ```
 
-## CSS Variables
+---
 
-Sobreescribe cualquier token desde tu hoja de estilos, sin reconfigurar los componentes.
+## 🎨 Estilos
+
+Todos los detalles visuales se controlan mediante CSS custom properties `--hub-toast-*`.
 
 ### Elemento toast
 
@@ -164,38 +229,44 @@ Sobreescribe cualquier token desde tu hoja de estilos, sin reconfigurar los comp
 ### Ejemplo de tematización
 
 ```css
-/* toast oscuro global para todos los tipos */
 :root {
-  --hub-toast-bg: #1e1e1e;
-  --hub-toast-color: #f5f5f5;
-  --hub-toast-border-radius: 0.5rem;
-  --hub-toast-container-offset: 1.5rem;
+    --hub-toast-border-radius: 0.5rem;
+    --hub-toast-container-offset: 1.5rem;
 }
 ```
 
-## Tipos de toast personalizados
-
-Pasa cualquier string como argumento `type` en `show()`. Usa `--hub-toast-accent` para activar la derivación automática de colores:
+### Tipos de toast personalizados
 
 ```typescript
 this.toast.show('Sincronización en cola.', 'Sin conexión', { timeOut: 0 }, 'offline');
 ```
 
 ```css
-/* acento para el tipo personalizado */
 hub-toast[data-type='offline'] {
-  --hub-toast-accent: #6c757d;
+    --hub-toast-accent: #6c757d;
 }
 ```
 
-## Dependencias entre pares
+---
 
-| Paquete | Versión |
-|---|---|
-| `@angular/core` | `>=22.0.0` |
-| `@angular/common` | `>=22.0.0` |
-| `@angular/animations` | `>=22.0.0` |
+## 📦 Dependencias entre pares
 
-## Licencia
+```json
+{
+    "@angular/animations": ">=22.0.0",
+    "@angular/common": ">=22.0.0",
+    "@angular/core": ">=22.0.0"
+}
+```
+
+---
+
+## 📊 Changelog
+
+Ver [CHANGELOG.md](./CHANGELOG.md).
+
+---
+
+## 📄 Licencia
 
 MIT © [Carlos Morcillo](https://www.carlosmorcillo.com)
