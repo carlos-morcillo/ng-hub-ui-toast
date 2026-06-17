@@ -1,6 +1,6 @@
 // ─── Container position token defaults ────────────────────────────────────────
 
-:where(.hub-toast-container) {
+:host {
 	--hub-toast-container-gap: var(--hub-ref-space-2, 0.5rem);
 	--hub-toast-container-z-index: 1050;
 	--hub-toast-container-offset: var(--hub-ref-space-3, 1rem);
@@ -8,7 +8,11 @@
 
 // ─── Container shell ──────────────────────────────────────────────────────────
 
-.hub-toast-container {
+// :host targets the hub-toast-container element itself (has _nghost attribute).
+// Plain class selectors compile to [_ngcontent] which does not match the host
+// when the container is dynamically appended to document.body via createComponent.
+
+:host {
 	position: fixed;
 	z-index: var(--hub-toast-container-z-index);
 	display: flex;

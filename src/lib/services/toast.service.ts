@@ -1,4 +1,4 @@
-import { ApplicationRef, createComponent, inject, Injectable, signal } from '@angular/core';
+import { ApplicationRef, ComponentRef, createComponent, inject, Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
 import type { HubToastConfig, HubToastData, HubToastRef, HubToastType } from '../models/toast.types';
 import { ToastConfigService } from './toast-config.service';
@@ -29,6 +29,8 @@ export class ToastService {
 	readonly toasts = signal<HubToastData[]>([]);
 
 	private _containerMounted = false;
+	/** Reference to the lazily created container, kept for explicit CD triggers. */
+	private _containerRef: ComponentRef<unknown> | null = null;
 
 	// ─── Public shorthand methods ───────────────────────────────────────────
 
@@ -124,6 +126,7 @@ export class ToastService {
 		}
 
 		this._ensureContainerMounted();
+		this._syncContainer();
 		return this._buildRef(data);
 	}
 
@@ -142,6 +145,7 @@ export class ToastService {
 			t.onHidden$.complete();
 		});
 		this.toasts.set([]);
+		this._syncContainer();
 	}
 
 	// ─── Internal helpers ────────────────────────────────────────────────────
@@ -152,6 +156,7 @@ export class ToastService {
 			toast.onHidden$.next();
 			toast.onHidden$.complete();
 			this.toasts.update((list) => list.filter((t) => t.toastId !== toastId));
+			this._syncContainer();
 		}
 	}
 
@@ -193,8 +198,23 @@ export class ToastService {
 			const ref = createComponent(ToastContainerComponent, {
 				environmentInjector: this._appRef.injector
 			});
+			this._containerRef = ref;
 			this._appRef.attachView(ref.hostView);
 			document.body.appendChild(ref.location.nativeElement);
+			// Initial render: signal may already hold toasts queued before the import resolved.
+			ref.changeDetectorRef.detectChanges();
 		});
+	}
+
+	/**
+	 * Explicitly runs change detection on the container.
+	 *
+	 * Views created via `createComponent` + `attachView` are not reachable by
+	 * Angular's signal-based "mark ancestors dirty" traversal, so they do not
+	 * update automatically when a signal changes. Calling `detectChanges()`
+	 * directly on the container's `ChangeDetectorRef` is the reliable alternative.
+	 */
+	private _syncContainer(): void {
+		this._containerRef?.changeDetectorRef.detectChanges();
 	}
 }
