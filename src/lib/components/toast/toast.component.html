@@ -1,0 +1,33 @@
+<div
+	class="hub-toast__body"
+	(mouseenter)="onMouseEnter()"
+	(mouseleave)="onMouseLeave()"
+>
+	@if (data().title) {
+		<div class="hub-toast__title">{{ data().title }}</div>
+	}
+	<div class="hub-toast__message">{{ data().message }}</div>
+</div>
+
+@if (data().config.closeButton) {
+	<button
+		type="button"
+		class="hub-toast__close"
+		aria-label="Close"
+		(click)="onClose($event)"
+	>
+		<span aria-hidden="true">&times;</span>
+	</button>
+}
+
+@if (data().config.progressBar) {
+	<div
+		class="hub-toast__progress"
+		role="progressbar"
+		[attr.aria-valuenow]="progress()"
+		aria-valuemin="0"
+		aria-valuemax="100"
+	>
+		<div class="hub-toast__progress-bar" [style.width.%]="progress()"></div>
+	</div>
+}

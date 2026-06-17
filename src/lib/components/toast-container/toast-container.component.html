@@ -1,0 +1,3 @@
+@for (toast of toasts(); track toast.toastId) {
+	<hub-toast [data]="toast" (closed)="onClosed($event)" />
+}

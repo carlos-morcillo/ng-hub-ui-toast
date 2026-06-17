@@ -1,0 +1,124 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// hub-toast token contract — public `--hub-toast-*` defaults
+// All declared at zero specificity so any consumer theme wins.
+// ─────────────────────────────────────────────────────────────────────────────
+
+:where(.hub-toast) {
+	// Structure
+	--hub-toast-min-width: 18rem;
+	--hub-toast-max-width: 26rem;
+	--hub-toast-padding-x: var(--hub-ref-space-3, 1rem);
+	--hub-toast-padding-y: var(--hub-ref-space-3, 1rem);
+	--hub-toast-border-radius: var(--hub-ref-radius-md, 0.375rem);
+	--hub-toast-border-width: var(--hub-ref-border-width, 1px);
+	--hub-toast-shadow: var(--hub-sys-shadow-md, 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1));
+	--hub-toast-gap: var(--hub-ref-space-1, 0.25rem);
+	--hub-toast-accent-width: 0.25rem;
+
+	// Typography
+	--hub-toast-font-size: var(--hub-ref-font-size-base, 1rem);
+	--hub-toast-title-font-size: var(--hub-ref-font-size-base, 1rem);
+	--hub-toast-title-font-weight: 600;
+
+	// Colors — neutral fallback; overridden by @each loop below
+	--hub-toast-bg: var(--hub-sys-surface-page, #fff);
+	--hub-toast-color: var(--hub-sys-text-primary, #212529);
+	--hub-toast-border: var(--hub-sys-border-color-default, #dee2e6);
+	--hub-toast-accent: var(--hub-sys-border-color-default, #dee2e6);
+
+	// Progress bar
+	--hub-toast-progress-bg: color-mix(in srgb, var(--hub-toast-accent) 30%, transparent);
+	--hub-toast-progress-height: 0.25rem;
+
+	// Close button
+	--hub-toast-close-opacity: 0.5;
+	--hub-toast-close-opacity-hover: 1;
+}
+
+// ─── Open default — any custom type via inline --hub-toast-accent ─────────────
+:where(.hub-toast[data-type]) {
+	--hub-toast-bg: color-mix(in srgb, var(--hub-toast-accent) 14%, var(--hub-sys-surface-page, #fff));
+	--hub-toast-color: color-mix(in srgb, var(--hub-toast-accent) 72%, var(--hub-sys-text-primary, #212529));
+	--hub-toast-border: color-mix(in srgb, var(--hub-toast-accent) 30%, transparent);
+}
+
+// ─── Built-in types — exact DS tints ─────────────────────────────────────────
+$hub-toast-types: success, error, warning, info;
+
+@each $type in $hub-toast-types {
+	:where(.hub-toast[data-type='#{$type}']) {
+		--hub-toast-bg: var(--hub-sys-color-#{$type}-subtle);
+		--hub-toast-color: var(--hub-sys-color-#{$type}-emphasis);
+		--hub-toast-border: var(--hub-sys-color-#{$type}-border-subtle);
+		--hub-toast-accent: var(--hub-sys-color-#{$type});
+	}
+}
+
+// ─── Component styles ─────────────────────────────────────────────────────────
+.hub-toast {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	min-width: var(--hub-toast-min-width);
+	max-width: var(--hub-toast-max-width);
+	padding: var(--hub-toast-padding-y) var(--hub-toast-padding-x);
+	border-radius: var(--hub-toast-border-radius);
+	border: var(--hub-toast-border-width) solid var(--hub-toast-border);
+	border-inline-start-width: var(--hub-toast-accent-width);
+	border-inline-start-color: var(--hub-toast-accent);
+	background: var(--hub-toast-bg);
+	color: var(--hub-toast-color);
+	box-shadow: var(--hub-toast-shadow);
+	cursor: default;
+	overflow: hidden;
+
+	&__body {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: var(--hub-toast-gap);
+	}
+
+	&__title {
+		font-size: var(--hub-toast-title-font-size);
+		font-weight: var(--hub-toast-title-font-weight);
+		line-height: 1.25;
+	}
+
+	&__message {
+		font-size: var(--hub-toast-font-size);
+		line-height: 1.5;
+	}
+
+	&__close {
+		flex: 0 0 auto;
+		padding: 0;
+		margin-inline-start: var(--hub-toast-padding-x);
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-size: 1.25rem;
+		line-height: 1;
+		color: inherit;
+		opacity: var(--hub-toast-close-opacity);
+		transition: opacity 0.15s ease;
+
+		&:hover {
+			opacity: var(--hub-toast-close-opacity-hover);
+		}
+	}
+
+	&__progress {
+		position: absolute;
+		inset-inline: 0;
+		bottom: 0;
+		height: var(--hub-toast-progress-height);
+		background: transparent;
+	}
+
+	&__progress-bar {
+		height: 100%;
+		background: var(--hub-toast-progress-bg);
+		transition: width 50ms linear;
+	}
+}

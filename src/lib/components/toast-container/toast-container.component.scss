@@ -1,0 +1,63 @@
+// ─── Container position token defaults ────────────────────────────────────────
+
+:where(.hub-toast-container) {
+	--hub-toast-container-gap: var(--hub-ref-space-2, 0.5rem);
+	--hub-toast-container-z-index: 1050;
+	--hub-toast-container-offset: var(--hub-ref-space-3, 1rem);
+}
+
+// ─── Container shell ──────────────────────────────────────────────────────────
+
+.hub-toast-container {
+	position: fixed;
+	z-index: var(--hub-toast-container-z-index);
+	display: flex;
+	flex-direction: column;
+	gap: var(--hub-toast-container-gap);
+	pointer-events: none;
+
+	hub-toast {
+		pointer-events: all;
+	}
+
+	&.toast-top-right {
+		top: var(--hub-toast-container-offset);
+		inset-inline-end: var(--hub-toast-container-offset);
+		align-items: flex-end;
+	}
+
+	&.toast-top-left {
+		top: var(--hub-toast-container-offset);
+		inset-inline-start: var(--hub-toast-container-offset);
+		align-items: flex-start;
+	}
+
+	&.toast-top-center {
+		top: var(--hub-toast-container-offset);
+		left: 50%;
+		transform: translateX(-50%);
+		align-items: center;
+	}
+
+	&.toast-bottom-right {
+		bottom: var(--hub-toast-container-offset);
+		inset-inline-end: var(--hub-toast-container-offset);
+		align-items: flex-end;
+		flex-direction: column-reverse;
+	}
+
+	&.toast-bottom-left {
+		bottom: var(--hub-toast-container-offset);
+		inset-inline-start: var(--hub-toast-container-offset);
+		align-items: flex-start;
+		flex-direction: column-reverse;
+	}
+
+	&.toast-bottom-center {
+		bottom: var(--hub-toast-container-offset);
+		left: 50%;
+		transform: translateX(-50%);
+		align-items: center;
+		flex-direction: column-reverse;
+	}
+}
