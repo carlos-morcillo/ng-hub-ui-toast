@@ -3,10 +3,10 @@
 **Español** | [English](./README.md)
 
 [![NPM Version](https://img.shields.io/npm/v/ng-hub-ui-toast.svg)](https://www.npmjs.com/package/ng-hub-ui-toast)
-[![Angular](https://img.shields.io/badge/Angular-22-red.svg)](https://angular.dev)
+[![Angular](https://img.shields.io/badge/Angular-21%2B-red.svg)](https://angular.dev)
 [![License](https://img.shields.io/npm/l/ng-hub-ui-toast.svg)](LICENSE)
 
-Servicio de notificaciones toast para Angular 22 standalone — API imperativa, observables de ciclo de vida, barra de progreso, seis posiciones y tematización completa con CSS variables. Sin dependencias externas.
+Servicio de notificaciones toast para Angular standalone (Angular 21+) — API imperativa, observables de ciclo de vida, barra de progreso, seis posiciones y tematización completa con CSS variables. Sin dependencias externas.
 
 ## Documentación y ejemplos en vivo
 
@@ -94,7 +94,7 @@ export class SaveComponent {
 
 ## 📦 Descripción
 
-`ng-hub-ui-toast` es un servicio de notificaciones sin dependencias externas para Angular 22+ standalone. Llama a `ToastService.success()`, `.error()`, `.warning()` o `.info()` desde cualquier componente o servicio; el contenedor overlay se monta de forma lazy la primera vez que se lanza una notificación. Cada llamada devuelve un `HubToastRef` con observables `onShown`, `onHidden` y `onTap`, más `manualClose()` / `resetTimeout()`.
+`ng-hub-ui-toast` es un servicio de notificaciones sin dependencias externas para Angular 21+ standalone. Llama a `ToastService.success()`, `.error()`, `.warning()` o `.info()` desde cualquier componente o servicio; el contenedor overlay se monta de forma lazy la primera vez que se lanza una notificación. Cada llamada devuelve un `HubToastRef` con observables `onShown`, `onHidden` y `onTap`, más `manualClose()` / `resetTimeout()`.
 
 ## 🎯 Características
 
@@ -253,9 +253,9 @@ hub-toast[data-type='offline'] {
 
 ```json
 {
-    "@angular/animations": ">=22.0.0",
-    "@angular/common": ">=22.0.0",
-    "@angular/core": ">=22.0.0"
+    "@angular/animations": ">=21.0.0",
+    "@angular/common": ">=21.0.0",
+    "@angular/core": ">=21.0.0"
 }
 ```
 

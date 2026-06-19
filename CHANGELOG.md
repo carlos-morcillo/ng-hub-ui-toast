@@ -1,5 +1,11 @@
 # ng-hub-ui-toast Changelog
 
+## [22.1.0] - 2026-06-19
+
+### Changed
+
+- Lowered the Angular peer dependency floor from `>=22.0.0` to `>=21.0.0` (`@angular/core`, `@angular/common`, `@angular/animations`). The library uses only APIs available since Angular 21 (signal `input`/`output`, `effect`, `createComponent`, classic `@angular/animations` triggers), so it now installs and runs in Angular 21 applications. No source or API changes.
+
 ## [22.0.0] - 2026-06-17
 
 ### Added

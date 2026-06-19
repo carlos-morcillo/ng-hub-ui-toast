@@ -3,10 +3,10 @@
 [Español](./README.es.md) | **English**
 
 [![NPM Version](https://img.shields.io/npm/v/ng-hub-ui-toast.svg)](https://www.npmjs.com/package/ng-hub-ui-toast)
-[![Angular](https://img.shields.io/badge/Angular-22-red.svg)](https://angular.dev)
+[![Angular](https://img.shields.io/badge/Angular-21%2B-red.svg)](https://angular.dev)
 [![License](https://img.shields.io/npm/l/ng-hub-ui-toast.svg)](LICENSE)
 
-Signal-driven Angular 22 toast notification service — imperative API, lifecycle observables, progress bar, six positions, and full CSS-variable theming. Built as a standalone Angular service with zero external dependencies.
+Signal-driven Angular toast notification service (Angular 21+) — imperative API, lifecycle observables, progress bar, six positions, and full CSS-variable theming. Built as a standalone Angular service with zero external dependencies.
 
 ## Documentation and Live Examples
 
@@ -25,8 +25,9 @@ This library is part of the **ng-hub-ui** ecosystem:
 - [**ng-hub-ui-avatar**](https://www.npmjs.com/package/ng-hub-ui-avatar)
 - [**ng-hub-ui-board**](https://www.npmjs.com/package/ng-hub-ui-board)
 - [**ng-hub-ui-breadcrumbs**](https://www.npmjs.com/package/ng-hub-ui-breadcrumbs)
+- [**ng-hub-ui-buttons**](https://www.npmjs.com/package/ng-hub-ui-buttons)
 - [**ng-hub-ui-calendar**](https://www.npmjs.com/package/ng-hub-ui-calendar)
-- [**ng-hub-ui-dropdown**](https://www.npmjs.com/package/ng-hub-ui-dropdown)
+- [**ng-hub-ui-dropdown**](https://www.npmjs.com/package/ng-hub-ui-dropdown) _(deprecated — use ng-hub-ui-buttons)_
 - [**ng-hub-ui-forms**](https://www.npmjs.com/package/ng-hub-ui-forms)
 - [**ng-hub-ui-history**](https://www.npmjs.com/package/ng-hub-ui-history)
 - [**ng-hub-ui-milestones**](https://www.npmjs.com/package/ng-hub-ui-milestones)
@@ -96,7 +97,7 @@ export class SaveComponent {
 
 ## 📦 Description
 
-`ng-hub-ui-toast` is a zero-dependency notification service for Angular 22+ standalone apps. Call `ToastService.success()`, `.error()`, `.warning()` or `.info()` from any component or service; the overlay container is lazily mounted the first time a notification fires. Each call returns a `HubToastRef` with `onShown`, `onHidden` and `onTap` observables plus `manualClose()` / `resetTimeout()`.
+`ng-hub-ui-toast` is a zero-dependency notification service for Angular 21+ standalone apps. Call `ToastService.success()`, `.error()`, `.warning()` or `.info()` from any component or service; the overlay container is lazily mounted the first time a notification fires. Each call returns a `HubToastRef` with `onShown`, `onHidden` and `onTap` observables plus `manualClose()` / `resetTimeout()`.
 
 ## 🎯 Features
 
@@ -259,9 +260,9 @@ hub-toast[data-type='offline'] {
 
 ```json
 {
-    "@angular/animations": ">=22.0.0",
-    "@angular/common": ">=22.0.0",
-    "@angular/core": ">=22.0.0"
+    "@angular/animations": ">=21.0.0",
+    "@angular/common": ">=21.0.0",
+    "@angular/core": ">=21.0.0"
 }
 ```
 
