@@ -200,8 +200,7 @@ Todos los detalles visuales se controlan mediante CSS custom properties `--hub-t
 | `--hub-toast-bg` | `var(--hub-sys-surface-page, #fff)` | Color de fondo. |
 | `--hub-toast-color` | `var(--hub-sys-text-primary, #212529)` | Color del texto. |
 | `--hub-toast-border` | `var(--hub-sys-border-color-default, #dee2e6)` | Color del borde. |
-| `--hub-toast-accent` | `var(--hub-sys-border-color-default, #dee2e6)` | Color del borde de acento izquierdo. |
-| `--hub-toast-accent-width` | `0.25rem` | Grosor del borde de acento. |
+| `--hub-toast-accent` | `var(--hub-sys-border-color-default, #dee2e6)` | Color de acento — controla todo el borde y la barra de progreso. |
 | `--hub-toast-min-width` | `18rem` | Ancho mínimo. |
 | `--hub-toast-max-width` | `26rem` | Ancho máximo. |
 | `--hub-toast-padding-x` | `var(--hub-ref-space-3, 1rem)` | Padding horizontal. |
@@ -232,6 +231,28 @@ Todos los detalles visuales se controlan mediante CSS custom properties `--hub-t
 :root {
     --hub-toast-border-radius: 0.5rem;
     --hub-toast-container-offset: 1.5rem;
+}
+```
+
+### Tematización con el mixin `hub-toast-theme()`
+
+En proyectos Sass, el mixin `hub-toast-theme()` permite re-skinnear un toast en una sola llamada. Todos los parámetros son opcionales y por defecto valen `null`, así que solo los que pases se emiten como overrides `--hub-toast-*` — el resto conservan sus valores por defecto. Está basado en tokens y no depende de Bootstrap. Las tintas semánticas por `data-type` se siguen aplicando automáticamente; usa el mixin para re-skinnear el shell compartido o para personalizar un tipo de toast propio en su propio selector.
+
+```scss
+@use 'ng-hub-ui-toast/styles/mixins/toast-theme' as *;
+
+// Personaliza el shell compartido:
+hub-toast {
+    @include hub-toast-theme(
+        $border-radius: 0.75rem,
+        $border-width: 2px,
+        $shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.18)
+    );
+}
+
+// O un tipo semántico personalizado (data-type="brand"):
+hub-toast[data-type='brand'] {
+    @include hub-toast-theme($accent: #6f42c1, $bg: #f5f0fb, $color: #4a2c82);
 }
 ```
 

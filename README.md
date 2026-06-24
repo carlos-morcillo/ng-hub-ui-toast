@@ -205,8 +205,7 @@ Every visual detail is controlled by `--hub-toast-*` CSS custom properties.
 | `--hub-toast-bg` | `var(--hub-sys-surface-page, #fff)` | Background colour. |
 | `--hub-toast-color` | `var(--hub-sys-text-primary, #212529)` | Text colour. |
 | `--hub-toast-border` | `var(--hub-sys-border-color-default, #dee2e6)` | Border colour. |
-| `--hub-toast-accent` | `var(--hub-sys-border-color-default, #dee2e6)` | Left accent border colour. |
-| `--hub-toast-accent-width` | `0.25rem` | Left accent border thickness. |
+| `--hub-toast-accent` | `var(--hub-sys-border-color-default, #dee2e6)` | Accent colour — drives the full border and the progress bar. |
 | `--hub-toast-min-width` | `18rem` | Minimum width. |
 | `--hub-toast-max-width` | `26rem` | Maximum width. |
 | `--hub-toast-padding-x` | `var(--hub-ref-space-3, 1rem)` | Horizontal padding. |
@@ -237,6 +236,28 @@ Every visual detail is controlled by `--hub-toast-*` CSS custom properties.
 :root {
     --hub-toast-border-radius: 0.5rem;
     --hub-toast-container-offset: 1.5rem;
+}
+```
+
+### Theming with the `hub-toast-theme()` mixin
+
+For Sass projects, the `hub-toast-theme()` mixin lets you re-skin a toast in a single call. Every parameter is optional and defaults to `null`, so only the ones you pass are emitted as `--hub-toast-*` overrides — the rest keep their defaults. It is token-based and has no Bootstrap dependency. The semantic `data-type` tints are still applied automatically; use the mixin to re-skin the shared shell or to brand a custom toast type on its own selector.
+
+```scss
+@use 'ng-hub-ui-toast/styles/mixins/toast-theme' as *;
+
+// Brand the shared shell:
+hub-toast {
+    @include hub-toast-theme(
+        $border-radius: 0.75rem,
+        $border-width: 2px,
+        $shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.18)
+    );
+}
+
+// Or a custom semantic type (data-type="brand"):
+hub-toast[data-type='brand'] {
+    @include hub-toast-theme($accent: #6f42c1, $bg: #f5f0fb, $color: #4a2c82);
 }
 ```
 

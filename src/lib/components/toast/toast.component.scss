@@ -16,7 +16,6 @@
 	--hub-toast-border-width: var(--hub-ref-border-width, 1px);
 	--hub-toast-shadow: var(--hub-sys-shadow-md, 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1));
 	--hub-toast-gap: var(--hub-ref-space-1, 0.25rem);
-	--hub-toast-accent-width: 0.25rem;
 
 	// Typography
 	--hub-toast-font-size: var(--hub-ref-font-size-base, 1rem);
@@ -39,10 +38,12 @@
 }
 
 // ─── Open default — any custom type via inline --hub-toast-accent ─────────────
+// The toast carries a plain 1px border in the semantic colour (the accent);
+// the background is a light tint of it and the text its emphasis shade.
 :where(:host[data-type]) {
 	--hub-toast-bg: color-mix(in srgb, var(--hub-toast-accent) 14%, var(--hub-sys-surface-page, #fff));
 	--hub-toast-color: color-mix(in srgb, var(--hub-toast-accent) 72%, var(--hub-sys-text-primary, #212529));
-	--hub-toast-border: color-mix(in srgb, var(--hub-toast-accent) 30%, transparent);
+	--hub-toast-border: var(--hub-toast-accent);
 }
 
 // ─── Built-in types — exact DS tints ─────────────────────────────────────────
@@ -54,8 +55,8 @@ $hub-toast-types: success, warning, info;
 	:where(:host[data-type='#{$type}']) {
 		--hub-toast-bg: var(--hub-sys-color-#{$type}-subtle);
 		--hub-toast-color: var(--hub-sys-color-#{$type}-emphasis);
-		--hub-toast-border: var(--hub-sys-color-#{$type}-border-subtle);
 		--hub-toast-accent: var(--hub-sys-color-#{$type});
+		// border inherits var(--hub-toast-accent) from the [data-type] rule
 	}
 }
 
@@ -64,7 +65,6 @@ $hub-toast-types: success, warning, info;
 :where(:host[data-type='error']) {
 	--hub-toast-bg: var(--hub-sys-color-danger-subtle);
 	--hub-toast-color: var(--hub-sys-color-danger-emphasis);
-	--hub-toast-border: var(--hub-sys-color-danger-border-subtle);
 	--hub-toast-accent: var(--hub-sys-color-danger);
 }
 
@@ -82,8 +82,6 @@ $hub-toast-types: success, warning, info;
 	padding: var(--hub-toast-padding-y) var(--hub-toast-padding-x);
 	border-radius: var(--hub-toast-border-radius);
 	border: var(--hub-toast-border-width) solid var(--hub-toast-border);
-	border-inline-start-width: var(--hub-toast-accent-width);
-	border-inline-start-color: var(--hub-toast-accent);
 	background: var(--hub-toast-bg);
 	color: var(--hub-toast-color);
 	box-shadow: var(--hub-toast-shadow);

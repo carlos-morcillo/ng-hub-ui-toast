@@ -1,0 +1,143 @@
+// ─────────────────────────────────────────────────────────────────────────
+// hub-toast-theme — one-call theming for `<hub-toast>` notifications
+// ─────────────────────────────────────────────────────────────────────────
+//
+// Override any of the `--hub-toast-*` design tokens in a single include. Every
+// parameter is OPTIONAL and defaults to `null`: only the parameters you pass
+// are emitted, so the rest keep the component's defaults. Token-based and
+// self-contained (no Bootstrap dependencies).
+//
+// The semantic `data-type` tints (success / error / warning / info, plus any
+// custom `--hub-sys-color-<type>`) are applied automatically; use this mixin to
+// re-skin the shared shell — accent (1px semantic border + progress colour),
+// surfaces, radius, spacing, the progress bar — or to brand a custom toast type
+// on its own selector.
+//
+// @example
+//
+//   @use 'ng-hub-ui-toast/styles/mixins/toast-theme' as *;
+//
+//   // Brand the shared shell:
+//   hub-toast {
+//     @include hub-toast-theme(
+//       $border-radius: 0.75rem,
+//       $border-width: 2px,
+//       $shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.18)
+//     );
+//   }
+//
+//   // Or a custom semantic type (data-type="brand"):
+//   hub-toast[data-type='brand'] {
+//     @include hub-toast-theme($accent: #6f42c1, $bg: #f5f0fb, $color: #4a2c82);
+//   }
+//
+// scss-docs-start hub-toast-theme
+@mixin hub-toast-theme(
+	// ── Accent / semantic surface (accent = border + progress colour) ──
+	$accent: null,
+	$bg: null,
+	$color: null,
+	$border: null,
+	// ── Shell ──
+	$border-width: null,
+	$border-radius: null,
+	$shadow: null,
+	$min-width: null,
+	$max-width: null,
+	$padding-x: null,
+	$padding-y: null,
+	$gap: null,
+	// ── Typography ──
+	$font-size: null,
+	$title-font-size: null,
+	$title-font-weight: null,
+	// ── Progress bar ──
+	$progress-bg: null,
+	$progress-height: null,
+	// ── Close button ──
+	$close-opacity: null,
+	$close-opacity-hover: null,
+	// ── Container (stack) ──
+	$container-gap: null,
+	$container-offset: null,
+	$container-z-index: null
+) {
+	// Accent / semantic surface
+	@if $accent != null {
+		--hub-toast-accent: #{$accent};
+	}
+	@if $bg != null {
+		--hub-toast-bg: #{$bg};
+	}
+	@if $color != null {
+		--hub-toast-color: #{$color};
+	}
+	@if $border != null {
+		--hub-toast-border: #{$border};
+	}
+
+	// Shell
+	@if $border-width != null {
+		--hub-toast-border-width: #{$border-width};
+	}
+	@if $border-radius != null {
+		--hub-toast-border-radius: #{$border-radius};
+	}
+	@if $shadow != null {
+		--hub-toast-shadow: #{$shadow};
+	}
+	@if $min-width != null {
+		--hub-toast-min-width: #{$min-width};
+	}
+	@if $max-width != null {
+		--hub-toast-max-width: #{$max-width};
+	}
+	@if $padding-x != null {
+		--hub-toast-padding-x: #{$padding-x};
+	}
+	@if $padding-y != null {
+		--hub-toast-padding-y: #{$padding-y};
+	}
+	@if $gap != null {
+		--hub-toast-gap: #{$gap};
+	}
+
+	// Typography
+	@if $font-size != null {
+		--hub-toast-font-size: #{$font-size};
+	}
+	@if $title-font-size != null {
+		--hub-toast-title-font-size: #{$title-font-size};
+	}
+	@if $title-font-weight != null {
+		--hub-toast-title-font-weight: #{$title-font-weight};
+	}
+
+	// Progress bar
+	@if $progress-bg != null {
+		--hub-toast-progress-bg: #{$progress-bg};
+	}
+	@if $progress-height != null {
+		--hub-toast-progress-height: #{$progress-height};
+	}
+
+	// Close button
+	@if $close-opacity != null {
+		--hub-toast-close-opacity: #{$close-opacity};
+	}
+	@if $close-opacity-hover != null {
+		--hub-toast-close-opacity-hover: #{$close-opacity-hover};
+	}
+
+	// Container (stack)
+	@if $container-gap != null {
+		--hub-toast-container-gap: #{$container-gap};
+	}
+	@if $container-offset != null {
+		--hub-toast-container-offset: #{$container-offset};
+	}
+	@if $container-z-index != null {
+		--hub-toast-container-z-index: #{$container-z-index};
+	}
+}
+// scss-docs-end hub-toast-theme

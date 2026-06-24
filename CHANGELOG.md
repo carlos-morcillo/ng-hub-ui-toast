@@ -1,5 +1,20 @@
 # ng-hub-ui-toast Changelog
 
+## [22.2.0] - 2026-06-24
+
+### Added
+
+- New **`hub-toast-theme()` Sass mixin** (`styles/mixins/toast-theme`) — re-skin a toast in one call: accent (1px semantic border + progress colour), surfaces, border/radius/shadow, spacing, typography, progress bar, close button and container (stack) tokens. Every parameter is optional and defaults to `null`, so only the ones you pass are emitted as `--hub-toast-*` overrides; the rest keep their defaults. Apply it to `hub-toast` for all toasts, or to `hub-toast[data-type='<custom>']` to brand a custom semantic type. Token-based, no Bootstrap dependency. (The built-in `success` / `error` / `warning` / `info` tints are unchanged and still applied automatically.)
+- `ng-package.json` now ships the `styles/` directory as a package asset (`assets` + `styleIncludePaths`) so the new mixin is importable from consumers via `@use 'ng-hub-ui-toast/styles/mixins/toast-theme'`.
+
+### Changed
+
+- **Toast accent is now a full 1px border in the semantic colour** instead of a thick left stripe. The toast keeps its tinted background and emphasis text, but the `border-inline-start` accent stripe was replaced by a plain `1px solid` border in the type's accent colour (`--hub-toast-border` now resolves to `--hub-toast-accent` for every `data-type`). The built-in types (`success` / `error` / `warning` / `info`) no longer use the muted `--hub-sys-color-*-border-subtle` token for their border; they now take the full-strength `--hub-sys-color-*` accent, so their borders are noticeably more saturated. Purely visual.
+
+### Removed
+
+- Removed the `--hub-toast-accent-width` token (the left accent stripe it sized no longer exists). The accent colour now drives the border and the progress bar through `--hub-toast-accent`.
+
 ## [22.1.0] - 2026-06-19
 
 ### Changed
