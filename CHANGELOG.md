@@ -1,5 +1,12 @@
 # ng-hub-ui-toast Changelog
 
+## [22.2.1] - 2026-06-25
+
+### Fixed
+
+- Design-token consistency pass: aligned inline fallback defaults with the canonical `ng-hub-ui-ds` values and routed hardcoded literals (z-index, font-weight, line-height, radii and theme-aware colours) through their `--hub-sys-*` / `--hub-ref-*` tokens, so they follow the active theme. No visual change when the ds tokens are loaded.
+- Toasts now stack at the correct elevation: the container `z-index` resolves through `--hub-sys-zindex-toast` (1090) instead of a hardcoded `1050` (the modal-backdrop layer), so a toast can no longer be occluded by a modal backdrop.
+
 ## [22.2.0] - 2026-06-24
 
 ### Added

@@ -20,7 +20,7 @@
 	// Typography
 	--hub-toast-font-size: var(--hub-ref-font-size-base, 1rem);
 	--hub-toast-title-font-size: var(--hub-ref-font-size-base, 1rem);
-	--hub-toast-title-font-weight: 600;
+	--hub-toast-title-font-weight: var(--hub-ref-font-weight-semibold, 600);
 
 	// Colors — neutral fallback; overridden by @each loop below
 	--hub-toast-bg: var(--hub-sys-surface-page, #fff);
@@ -100,12 +100,12 @@ $hub-toast-types: success, warning, info;
 	&__title {
 		font-size: var(--hub-toast-title-font-size);
 		font-weight: var(--hub-toast-title-font-weight);
-		line-height: 1.25;
+		line-height: var(--hub-ref-line-height-sm, 1.25);
 	}
 
 	&__message {
 		font-size: var(--hub-toast-font-size);
-		line-height: 1.5;
+		line-height: var(--hub-ref-line-height-base, 1.5);
 	}
 
 	&__close {
@@ -115,7 +115,7 @@ $hub-toast-types: success, warning, info;
 		background: none;
 		border: none;
 		cursor: pointer;
-		font-size: 1.25rem;
+		font-size: var(--hub-ref-font-size-lg, 1.25rem);
 		line-height: 1;
 		color: inherit;
 		opacity: var(--hub-toast-close-opacity);
