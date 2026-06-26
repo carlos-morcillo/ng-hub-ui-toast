@@ -1,5 +1,18 @@
 # ng-hub-ui-toast Changelog
 
+## [22.3.0] - 2026-06-26
+
+### Added
+
+- **Open-set accent types.** The built-in `data-type` map now also covers the full open accent set — `primary`, `secondary`, `neutral`, `light`, `dark` join the classic `success` / `warning` / `info` (and `error`→danger), each pulling its exact `--hub-sys-color-<type>` family. Any other `data-type` keeps working at runtime with no recompile: define a single `--hub-sys-color-<name>` and `data-type="<name>"` derives its surface/border/progress from the open-set `[data-type]` default.
+- New derived accent roles `--hub-toast-accent-subtle`, `--hub-toast-accent-emphasis` and `--hub-toast-accent-on`, mixed locally from the single `--hub-toast-accent` slot. The toast background and text now resolve through `-subtle` / `-emphasis`; `-on` is available for accent-filled affordances.
+- The `hub-toast-theme()` mixin now re-derives the accent role family whenever its `$accent` parameter is passed, so a brand accent applied on a custom selector recomputes `-subtle` / `-emphasis` / `-on` (the slot stays the single source of truth — no duplication).
+
+### Changed
+
+- Canonical `zindex` token name (BREAKING): `--hub-toast-container-z-index` → `--hub-toast-container-zindex` (no hyphen, matching the `--hub-sys-zindex-*` convention).
+- The accent role family and the progress-bar tint are now mixed in the **OKLCH** colour space (`color-mix(in oklch, …)`) instead of sRGB, for perceptually even tints across every accent. No token API change; tints shift very slightly.
+
 ## [22.2.1] - 2026-06-25
 
 ### Fixed

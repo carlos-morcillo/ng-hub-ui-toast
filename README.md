@@ -228,7 +228,7 @@ Every visual detail is controlled by `--hub-toast-*` CSS custom properties.
 |---|---|---|
 | `--hub-toast-container-gap` | `var(--hub-ref-space-2, 0.5rem)` | Gap between stacked toasts. |
 | `--hub-toast-container-offset` | `var(--hub-ref-space-3, 1rem)` | Distance from screen edges. |
-| `--hub-toast-container-z-index` | `1050` | Stack order. |
+| `--hub-toast-container-zindex` | `1050` | Stack order. |
 
 ### Theming example
 

@@ -223,7 +223,7 @@ Todos los detalles visuales se controlan mediante CSS custom properties `--hub-t
 |---|---|---|
 | `--hub-toast-container-gap` | `var(--hub-ref-space-2, 0.5rem)` | Espacio entre toasts apilados. |
 | `--hub-toast-container-offset` | `var(--hub-ref-space-3, 1rem)` | Distancia a los bordes de pantalla. |
-| `--hub-toast-container-z-index` | `1050` | Orden de apilamiento. |
+| `--hub-toast-container-zindex` | `1050` | Orden de apilamiento. |
 
 ### Ejemplo de tematización
 

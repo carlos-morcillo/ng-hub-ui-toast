@@ -64,7 +64,15 @@
 ) {
 	// Accent / semantic surface
 	@if $accent != null {
+		// Feed the single accent slot AND re-derive the role family locally, so a
+		// brand accent applied via this mixin on a custom selector recomputes
+		// `-subtle` / `-emphasis` / `-on` (the `:host` derivations do not cascade
+		// to a different selector). No token is duplicated — the slot stays the
+		// single source of truth.
 		--hub-toast-accent: #{$accent};
+		--hub-toast-accent-subtle: color-mix(in oklch, var(--hub-toast-accent) 14%, var(--hub-sys-surface-page, #fff));
+		--hub-toast-accent-emphasis: color-mix(in oklch, var(--hub-toast-accent) 72%, var(--hub-sys-text-primary, #212529));
+		--hub-toast-accent-on: oklch(from var(--hub-toast-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h);
 	}
 	@if $bg != null {
 		--hub-toast-bg: #{$bg};
@@ -137,7 +145,7 @@
 		--hub-toast-container-offset: #{$container-offset};
 	}
 	@if $container-z-index != null {
-		--hub-toast-container-z-index: #{$container-z-index};
+		--hub-toast-container-zindex: #{$container-z-index};
 	}
 }
 // scss-docs-end hub-toast-theme

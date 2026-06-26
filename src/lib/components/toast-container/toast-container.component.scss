@@ -2,7 +2,7 @@
 
 :host {
 	--hub-toast-container-gap: var(--hub-ref-space-2, 0.5rem);
-	--hub-toast-container-z-index: var(--hub-sys-zindex-toast, 1090);
+	--hub-toast-container-zindex: var(--hub-sys-zindex-toast, 1090);
 	--hub-toast-container-offset: var(--hub-ref-space-3, 1rem);
 }
 
@@ -14,7 +14,7 @@
 
 :host {
 	position: fixed;
-	z-index: var(--hub-toast-container-z-index);
+	z-index: var(--hub-toast-container-zindex);
 	display: flex;
 	flex-direction: column;
 	gap: var(--hub-toast-container-gap);
