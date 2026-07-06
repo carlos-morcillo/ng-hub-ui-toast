@@ -1,5 +1,21 @@
 # ng-hub-ui-toast Changelog
 
+## [22.4.0] - 2026-07-02
+
+### Changed
+
+- **One derivation strategy — canonical accent slot.** The built-in `data-type`s (`success` / `warning` / `info` / `primary` / `secondary` / `neutral` / `light` / `dark`, plus `error`→danger) now re-base ONLY the single `--hub-toast-accent` slot; the derived role family (`-subtle` / `-emphasis` / `-on`) always recomputes locally from it, so **custom accents now re-derive the full role family at runtime** (previously the built-in types pinned the pre-computed `--hub-sys-color-<type>-*` tints, freezing the family against a runtime accent override).
+- The local derivations were unified to the canonical design-system formulas — `--hub-toast-accent-subtle: color-mix(in oklch, accent 12%, --hub-sys-surface-page)` (was a `14%` mix) and `--hub-toast-accent-emphasis: color-mix(in oklch, accent 80%, --hub-sys-color-ink)` (was `72%` over `--hub-sys-text-primary`) — in the component and in the `hub-toast-theme()` mixin. These produce the same tints the ds families ship, so the built-in types render as before; custom-type tints shift very slightly to match them.
+
+### Fixed
+
+- `--hub-toast-shadow` inline fallback aligned with the actual ds value of `--hub-sys-shadow-md`: `0 0.5rem 1rem rgba(0, 0, 0, 0.15)` (was `0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)`). No change when the ds tokens are loaded.
+
+### Docs
+
+- Added `docs/css-variables-reference.md` — the complete CSS custom-property reference (now covered by the repo `tokens-parity` check F).
+- Realigned the README CSS-variable tables with the code: `--hub-toast-shadow` fallback, `--hub-toast-progress-bg` (`srgb` → `oklch`) and `--hub-toast-container-zindex` (`var(--hub-sys-zindex-toast, 1090)`).
+
 ## [22.3.0] - 2026-06-26
 
 ### Added

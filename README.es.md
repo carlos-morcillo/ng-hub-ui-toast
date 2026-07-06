@@ -207,13 +207,13 @@ Todos los detalles visuales se controlan mediante CSS custom properties `--hub-t
 | `--hub-toast-padding-y` | `var(--hub-ref-space-3, 1rem)` | Padding vertical. |
 | `--hub-toast-border-radius` | `var(--hub-ref-radius-md, 0.375rem)` | Radio de borde. |
 | `--hub-toast-border-width` | `var(--hub-ref-border-width, 1px)` | Grosor del borde. |
-| `--hub-toast-shadow` | `var(--hub-sys-shadow-md, 0 0.25rem 0.75rem rgba(0,0,0,.1))` | Box shadow. |
+| `--hub-toast-shadow` | `var(--hub-sys-shadow-md, 0 0.5rem 1rem rgba(0, 0, 0, 0.15))` | Box shadow. |
 | `--hub-toast-gap` | `var(--hub-ref-space-1, 0.25rem)` | Espacio entre título y mensaje. |
 | `--hub-toast-font-size` | `var(--hub-ref-font-size-base, 1rem)` | Tamaño de fuente del mensaje. |
 | `--hub-toast-title-font-size` | `var(--hub-ref-font-size-base, 1rem)` | Tamaño de fuente del título. |
 | `--hub-toast-title-font-weight` | `600` | Peso de fuente del título. |
 | `--hub-toast-progress-height` | `0.25rem` | Altura de la barra de progreso. |
-| `--hub-toast-progress-bg` | `color-mix(in srgb, var(--hub-toast-accent) 30%, transparent)` | Color de la barra de progreso. |
+| `--hub-toast-progress-bg` | `color-mix(in oklch, var(--hub-toast-accent) 30%, transparent)` | Color de la barra de progreso. |
 | `--hub-toast-close-opacity` | `0.5` | Opacidad del botón de cierre. |
 | `--hub-toast-close-opacity-hover` | `1` | Opacidad del botón de cierre al hacer hover. |
 
@@ -223,7 +223,7 @@ Todos los detalles visuales se controlan mediante CSS custom properties `--hub-t
 |---|---|---|
 | `--hub-toast-container-gap` | `var(--hub-ref-space-2, 0.5rem)` | Espacio entre toasts apilados. |
 | `--hub-toast-container-offset` | `var(--hub-ref-space-3, 1rem)` | Distancia a los bordes de pantalla. |
-| `--hub-toast-container-zindex` | `1050` | Orden de apilamiento. |
+| `--hub-toast-container-zindex` | `var(--hub-sys-zindex-toast, 1090)` | Orden de apilamiento. |
 
 ### Ejemplo de tematización
 

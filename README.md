@@ -212,13 +212,13 @@ Every visual detail is controlled by `--hub-toast-*` CSS custom properties.
 | `--hub-toast-padding-y` | `var(--hub-ref-space-3, 1rem)` | Vertical padding. |
 | `--hub-toast-border-radius` | `var(--hub-ref-radius-md, 0.375rem)` | Border radius. |
 | `--hub-toast-border-width` | `var(--hub-ref-border-width, 1px)` | Border width. |
-| `--hub-toast-shadow` | `var(--hub-sys-shadow-md, 0 0.25rem 0.75rem rgba(0,0,0,.1))` | Box shadow. |
+| `--hub-toast-shadow` | `var(--hub-sys-shadow-md, 0 0.5rem 1rem rgba(0, 0, 0, 0.15))` | Box shadow. |
 | `--hub-toast-gap` | `var(--hub-ref-space-1, 0.25rem)` | Gap between title and message. |
 | `--hub-toast-font-size` | `var(--hub-ref-font-size-base, 1rem)` | Message font size. |
 | `--hub-toast-title-font-size` | `var(--hub-ref-font-size-base, 1rem)` | Title font size. |
 | `--hub-toast-title-font-weight` | `600` | Title font weight. |
 | `--hub-toast-progress-height` | `0.25rem` | Progress bar height. |
-| `--hub-toast-progress-bg` | `color-mix(in srgb, var(--hub-toast-accent) 30%, transparent)` | Progress bar colour. |
+| `--hub-toast-progress-bg` | `color-mix(in oklch, var(--hub-toast-accent) 30%, transparent)` | Progress bar colour. |
 | `--hub-toast-close-opacity` | `0.5` | Close button opacity. |
 | `--hub-toast-close-opacity-hover` | `1` | Close button hover opacity. |
 
@@ -228,7 +228,7 @@ Every visual detail is controlled by `--hub-toast-*` CSS custom properties.
 |---|---|---|
 | `--hub-toast-container-gap` | `var(--hub-ref-space-2, 0.5rem)` | Gap between stacked toasts. |
 | `--hub-toast-container-offset` | `var(--hub-ref-space-3, 1rem)` | Distance from screen edges. |
-| `--hub-toast-container-zindex` | `1050` | Stack order. |
+| `--hub-toast-container-zindex` | `var(--hub-sys-zindex-toast, 1090)` | Stack order. |
 
 ### Theming example
 

@@ -70,8 +70,8 @@
 		// to a different selector). No token is duplicated — the slot stays the
 		// single source of truth.
 		--hub-toast-accent: #{$accent};
-		--hub-toast-accent-subtle: color-mix(in oklch, var(--hub-toast-accent) 14%, var(--hub-sys-surface-page, #fff));
-		--hub-toast-accent-emphasis: color-mix(in oklch, var(--hub-toast-accent) 72%, var(--hub-sys-text-primary, #212529));
+		--hub-toast-accent-subtle: color-mix(in oklch, var(--hub-toast-accent) 12%, var(--hub-sys-surface-page, #ffffff));
+		--hub-toast-accent-emphasis: color-mix(in oklch, var(--hub-toast-accent) 80%, var(--hub-sys-color-ink, #212529));
 		--hub-toast-accent-on: oklch(from var(--hub-toast-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h);
 	}
 	@if $bg != null {
