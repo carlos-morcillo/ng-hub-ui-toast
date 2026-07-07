@@ -1,5 +1,16 @@
 # ng-hub-ui-toast Changelog
 
+## [22.5.0] - 2026-07-07
+
+### Added
+
+- **Toast `type` accepts ANY colour.** A custom `type` (anything beyond the built-ins `success` / `error` / `warning` / `info`) now accepts a **registered accent name** _or_ a **literal colour** (`#ff0000`, `rgb(...)`, `oklch(...)`, a CSS named colour). A bareword resolves to its `--hub-sys-color-*` token with the word as raw fallback; a literal is used as-is. The full accent family (`-subtle` / `-emphasis` / `-on`) still re-derives from it via `color-mix`. Built-in types (and the `error`→`danger` mapping) are unchanged.
+- **`ng-hub-ui-toast/styles` root entry.** A `styles/index.scss` now forwards `hub-toast-theme`, so `@use 'ng-hub-ui-toast/styles' as *;` exposes the mixin from the package root.
+
+### Changed
+
+- **BREAKING (packaging) — SCSS ships at `ng-hub-ui-toast/styles`.** The theming mixin now builds to `dist/toast/styles/...` (was `dist/toast/src/lib/styles/...`), so `@use 'ng-hub-ui-toast/styles'` (and `.../styles/mixins/toast-theme`) resolves. Update any `@use` that reached into `src/lib/styles`.
+
 ## [22.4.0] - 2026-07-02
 
 ### Changed

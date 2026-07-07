@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { toastAnimation } from '../../animations/toast.animations';
 import { HubToastData, HubToastType } from '../../models/toast.types';
+import { resolveHubAccent } from '../../shared/resolve-hub-accent';
 
 /** Built-in type names that have exact DS token coverage via `@each`. */
 const BUILT_IN_TYPES = new Set<string>(['success', 'error', 'warning', 'info']);
@@ -48,13 +49,17 @@ export class ToastComponent implements OnDestroy {
 	readonly progress = signal(100);
 
 	/**
-	 * Inline accent token. Null for built-in types (covered by `@each`);
-	 * `var(--hub-sys-color-<type>)` for custom types so `color-mix` derives
-	 * the other tokens automatically.
+	 * Inline accent for the `--hub-toast-accent` slot. Null for built-in types
+	 * (covered by the SCSS `@each` / the `error`→`danger` mapping). For any other
+	 * type it accepts ANY colour: a bareword resolves to its `--hub-sys-color-*`
+	 * token with the word as raw fallback (named CSS colours work too), while a
+	 * literal `#hex` / `rgb()` / `oklch()` / `var()` is passed through unchanged —
+	 * `color-mix` derives the rest of the family either way.
 	 */
 	readonly accentToken = computed<string | null>(() => {
-		const type = this.data().type;
-		return BUILT_IN_TYPES.has(type) ? null : `var(--hub-sys-color-${type})`;
+		const type = this.data().type?.trim();
+		if (!type || BUILT_IN_TYPES.has(type)) return null;
+		return resolveHubAccent(type);
 	});
 
 	private _timerId: ReturnType<typeof setTimeout> | null = null;

@@ -1,0 +1,11 @@
+// ─────────────────────────────────────────────────────────────────────────
+// ng-hub-ui-toast — theming entry
+// ─────────────────────────────────────────────────────────────────────────
+// Opt-in one-call theming mixin, forwarded so consumers can `@use` it from the
+// package root:
+//
+//   @use 'ng-hub-ui-toast/styles' as *;
+//   .app-toasts { @include hub-toast-theme($accent: var(--hub-sys-color-brand)); }
+// ─────────────────────────────────────────────────────────────────────────
+
+@forward 'mixins/toast-theme';

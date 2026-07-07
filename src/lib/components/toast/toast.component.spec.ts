@@ -48,10 +48,16 @@ describe('ToastComponent', () => {
 		expect(component.accentToken()).toBeNull();
 	});
 
-	it('accentToken() returns css var for custom types', () => {
+	it('accentToken() resolves a custom name to its ds token with a raw fallback', () => {
 		componentRef.setInput('data', makeToastData({ type: 'brand' }));
 		fixture.detectChanges();
-		expect(component.accentToken()).toBe('var(--hub-sys-color-brand)');
+		expect(component.accentToken()).toBe('var(--hub-sys-color-brand, brand)');
+	});
+
+	it('accentToken() passes a literal colour through unchanged', () => {
+		componentRef.setInput('data', makeToastData({ type: '#ff0000' }));
+		fixture.detectChanges();
+		expect(component.accentToken()).toBe('#ff0000');
 	});
 
 	it('emits closed output on tap when tapToDismiss is true', () => {

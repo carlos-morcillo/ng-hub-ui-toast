@@ -1,5 +1,13 @@
 # Breaking Changes — ng-hub-ui-toast
 
+## [22.5.0] — 2026-07-07
+
+### SCSS ships at `ng-hub-ui-toast/styles` (packaging path)
+
+- **Change**: the `hub-toast-theme` mixin now builds to `dist/toast/styles/...` instead of `dist/toast/src/lib/styles/...`, and a `styles/index.scss` root entry forwards it.
+- **Impact**: a `@use` that reached into the old `src/lib/styles/...` path no longer resolves.
+- **Migration**: `@use 'ng-hub-ui-toast/styles' as *;` (or `.../styles/mixins/toast-theme`).
+
 ## [22.2.0] — 2026-06-24
 
 ### Removed
