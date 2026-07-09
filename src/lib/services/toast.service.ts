@@ -195,6 +195,14 @@ export class ToastService {
 		this._containerMounted = true;
 
 		import('../components/toast-container/toast-container.component').then(({ ToastContainerComponent }) => {
+			// The dynamic import resolves on a later microtask, by which time the application may
+			// already be gone — a toast raised just before teardown, a destroyed TestBed, an HMR
+			// reload. Touching the environment injector then throws NG0205.
+			if (this._appRef.destroyed) {
+				this._containerMounted = false;
+				return;
+			}
+
 			const ref = createComponent(ToastContainerComponent, {
 				environmentInjector: this._appRef.injector
 			});

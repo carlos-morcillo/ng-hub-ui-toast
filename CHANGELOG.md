@@ -1,5 +1,11 @@
 # ng-hub-ui-toast Changelog
 
+## [22.5.1] - 2026-07-09
+
+### Fixed
+
+- **`NG0205: Injector has already been destroyed` when a toast is raised just before teardown.** The toast container is mounted from the `.then()` of a dynamic `import()`, which resolves on a later microtask; if the application was destroyed in the meantime (a route teardown, an HMR reload, a finished test), `createComponent()` reached into a dead environment injector and threw. The mount now bails out when `ApplicationRef.destroyed` is set.
+
 ## [22.5.0] - 2026-07-07
 
 ### Added
