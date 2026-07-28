@@ -1,5 +1,11 @@
 # ng-hub-ui-toast Changelog
 
+## [22.5.2] - 2026-07-28
+
+### Fixed
+
+- **Toasts are announced to screen readers.** Each toast host is now a live region: `role="alert"` + `aria-live="assertive"` for `error`/`warning`, `role="status"` + `aria-live="polite"` for everything else, with `aria-atomic="true"`. Previously no live region existed anywhere, so notifications were invisible to assistive technology. Keyboard dismissal was already available through the close button (`config.closeButton`); the host tap remains a pointer convenience.
+
 ## [22.5.1] - 2026-07-09
 
 ### Fixed
