@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { toastAnimation } from '../../animations/toast.animations';
 import { HubToastData, HubToastType } from '../../models/toast.types';
-import { resolveHubAccent } from '../../shared/resolve-hub-accent';
+import { resolveHubAccent } from 'ng-hub-ui-utils';
 
 /** Built-in type names that have exact DS token coverage via `@each`. */
 const BUILT_IN_TYPES = new Set<string>(['success', 'error', 'warning', 'info']);
