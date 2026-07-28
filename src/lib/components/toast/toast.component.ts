@@ -32,6 +32,11 @@ const BUILT_IN_TYPES = new Set<string>(['success', 'error', 'warning', 'info']);
 	animations: [toastAnimation],
 	host: {
 		class: 'hub-toast',
+		// Live region: inserting an element with role=alert/status announces it.
+		// Errors/warnings interrupt (assertive); the rest wait their turn (polite).
+		'[attr.role]': '_isUrgent() ? "alert" : "status"',
+		'[attr.aria-live]': '_isUrgent() ? "assertive" : "polite"',
+		'aria-atomic': 'true',
 		'[@toastState]': '"in"',
 		'[attr.data-type]': 'data().type',
 		'[style.--hub-toast-accent]': 'accentToken()',
@@ -60,6 +65,12 @@ export class ToastComponent implements OnDestroy {
 		const type = this.data().type?.trim();
 		if (!type || BUILT_IN_TYPES.has(type)) return null;
 		return resolveHubAccent(type);
+	});
+
+	/** Urgent severities interrupt the screen reader; the rest queue politely. */
+	protected readonly _isUrgent = computed(() => {
+		const type = this.data().type?.trim();
+		return type === 'error' || type === 'warning';
 	});
 
 	private _timerId: ReturnType<typeof setTimeout> | null = null;
