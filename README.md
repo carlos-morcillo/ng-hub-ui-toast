@@ -10,11 +10,11 @@ Signal-driven Angular toast notification service (Angular 21+) — imperative AP
 
 ## Documentation and Live Examples
 
-This package is part of [Hub UI](https://hubui.dev/), a collection of Angular component libraries for standalone apps.
+This package is part of [Hub UI](https://hubui.dev/en/), a collection of Angular component libraries for standalone apps.
 
-- Docs: https://hubui.dev/toast/overview/
-- Live examples: https://hubui.dev/toast/examples/
-- Hub UI: https://hubui.dev/
+- Docs: https://hubui.dev/en/toast/overview/
+- Live examples: https://hubui.dev/en/toast/examples/
+- Hub UI: https://hubui.dev/en/
 
 ## 🧩 Library Family `ng-hub-ui`
 

@@ -10,11 +10,11 @@ Servicio de notificaciones toast para Angular standalone (Angular 21+) — API i
 
 ## Documentación y ejemplos en vivo
 
-Este paquete es parte de [Hub UI](https://hubui.dev/), una colección de bibliotecas de componentes Angular para apps standalone.
+Este paquete es parte de [Hub UI](https://hubui.dev/en/), una colección de bibliotecas de componentes Angular para apps standalone.
 
-- Docs: https://hubui.dev/toast/overview/
-- Ejemplos en vivo: https://hubui.dev/toast/examples/
-- Hub UI: https://hubui.dev/
+- Docs: https://hubui.dev/en/toast/overview/
+- Ejemplos en vivo: https://hubui.dev/en/toast/examples/
+- Hub UI: https://hubui.dev/en/
 
 ## 🧩 Familia de bibliotecas `ng-hub-ui`
 
