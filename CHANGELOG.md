@@ -1,5 +1,11 @@
 # ng-hub-ui-toast Changelog
 
+## [22.6.1] - 2026-08-08
+
+### Fixed
+
+- Documentation links now point at the canonical localized URLs. The README linked to `https://hubui.dev/<path>` with no locale prefix and no trailing slash, and both forms are 301-redirected, so every reader arriving from npm or GitHub landed on a redirect instead of the canonical page.
+
 ## [22.6.0] - 2026-07-28
 
 ### Changed
