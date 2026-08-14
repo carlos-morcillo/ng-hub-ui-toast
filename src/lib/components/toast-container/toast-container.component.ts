@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toastAnimation } from '../../animations/toast.animations';
 import { ToastService } from '../../services/toast.service';
 import { ToastComponent } from '../toast/toast.component';
 
@@ -16,7 +15,6 @@ import { ToastComponent } from '../toast/toast.component';
 	templateUrl: './toast-container.component.html',
 	styleUrl: './toast-container.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	animations: [toastAnimation],
 	imports: [ToastComponent],
 	host: {
 		class: 'hub-toast-container',

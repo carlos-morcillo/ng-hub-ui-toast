@@ -1,6 +1,6 @@
 {
 	"name": "ng-hub-ui-toast",
-	"version": "22.6.1",
+	"version": "22.7.0",
 	"description": "Standalone Angular toast/notification library (Angular 21+), part of the ng-hub-ui family.",
 	"author": "Carlos Morcillo <carlos.morcillo@me.com> (https://www.carlosmorcillo.com)",
 	"repository": {
@@ -14,7 +14,6 @@
 	"homepage": "https://hubui.dev/",
 	"keywords": ["angular", "toast", "notification", "ui-component", "ng-hub-ui", "signals", "standalone"],
 	"peerDependencies": {
-		"@angular/animations": ">=21.0.0",
 		"@angular/common": ">=21.0.0",
 		"@angular/core": ">=21.0.0",
 		"ng-hub-ui-utils": ">=22.7.0"

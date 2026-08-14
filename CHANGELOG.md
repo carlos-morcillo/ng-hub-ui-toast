@@ -1,5 +1,15 @@
 # ng-hub-ui-toast Changelog
 
+## [22.7.0] - 2026-08-14
+
+### Changed
+
+- Replaced the deprecated Angular animation trigger with a native CSS enter animation that respects reduced-motion preferences.
+
+### Removed
+
+- **Removed the `@angular/animations` peer dependency.** The package is deprecated upstream and the library no longer needs it. Applications that installed it only for `ng-hub-ui-toast` can drop it; those using it elsewhere are unaffected.
+
 ## [22.6.1] - 2026-08-08
 
 ### Fixed

@@ -274,7 +274,6 @@ hub-toast[data-type='offline'] {
 
 ```json
 {
-    "@angular/animations": ">=21.0.0",
     "@angular/common": ">=21.0.0",
     "@angular/core": ">=21.0.0"
 }

@@ -8,7 +8,6 @@ import {
 	output,
 	signal
 } from '@angular/core';
-import { toastAnimation } from '../../animations/toast.animations';
 import { HubToastData, HubToastType } from '../../models/toast.types';
 import { resolveHubAccent } from 'ng-hub-ui-utils';
 
@@ -29,7 +28,6 @@ const BUILT_IN_TYPES = new Set<string>(['success', 'error', 'warning', 'info']);
 	templateUrl: './toast.component.html',
 	styleUrl: './toast.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	animations: [toastAnimation],
 	host: {
 		class: 'hub-toast',
 		// Live region: inserting an element with role=alert/status announces it.
@@ -37,7 +35,6 @@ const BUILT_IN_TYPES = new Set<string>(['success', 'error', 'warning', 'info']);
 		'[attr.role]': '_isUrgent() ? "alert" : "status"',
 		'[attr.aria-live]': '_isUrgent() ? "assertive" : "polite"',
 		'aria-atomic': 'true',
-		'[@toastState]': '"in"',
 		'[attr.data-type]': 'data().type',
 		'[style.--hub-toast-accent]': 'accentToken()',
 		'(click)': 'onTap()'

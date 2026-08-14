@@ -98,10 +98,29 @@ $hub-toast-types: success, warning, info, primary, secondary, neutral, light, da
 	border-radius: var(--hub-toast-border-radius);
 	border: var(--hub-toast-border-width) solid var(--hub-toast-border);
 	background: var(--hub-toast-bg);
+	animation: hub-toast-enter 200ms ease-out both;
 	color: var(--hub-toast-color);
 	box-shadow: var(--hub-toast-shadow);
 	cursor: default;
 	overflow: hidden;
+}
+
+@keyframes hub-toast-enter {
+	from {
+		opacity: 0;
+		transform: translateX(100%);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:host {
+		animation: none;
+	}
 }
 
 .hub-toast {
