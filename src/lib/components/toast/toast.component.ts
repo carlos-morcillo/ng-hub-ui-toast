@@ -1,13 +1,4 @@
-import {
-	ChangeDetectionStrategy,
-	Component,
-	computed,
-	effect,
-	input,
-	OnDestroy,
-	output,
-	signal
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, OnDestroy, output, signal } from '@angular/core';
 import { HubToastData, HubToastType } from '../../models/toast.types';
 import { resolveHubAccent } from 'ng-hub-ui-utils';
 

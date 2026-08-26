@@ -13,7 +13,15 @@
 		"email": "carlos.morcillo@me.com"
 	},
 	"homepage": "https://hubui.dev/",
-	"keywords": ["angular", "toast", "notification", "ui-component", "ng-hub-ui", "signals", "standalone"],
+	"keywords": [
+		"angular",
+		"toast",
+		"notification",
+		"ui-component",
+		"ng-hub-ui",
+		"signals",
+		"standalone"
+	],
 	"peerDependencies": {
 		"@angular/common": ">=21.0.0",
 		"@angular/core": ">=21.0.0",
