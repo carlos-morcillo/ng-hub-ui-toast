@@ -1,5 +1,15 @@
 # ng-hub-ui-toast Changelog
 
+## [22.7.2] - 2026-09-01
+
+### Changed
+
+- **The `homepage` in the manifest points at this library's own documentation page** rather than at
+  the site root. It is the link a registry shows beside the package and the one a reader clicks from
+  it, and landing on a front page they then have to search is a worse answer than landing on the
+  reference for the package they were already looking at. Metadata only — no code, no types, no
+  styles change, and nothing a consumer imports is affected.
+
 ## [22.7.1] - 2026-08-17
 
 ### Fixed
