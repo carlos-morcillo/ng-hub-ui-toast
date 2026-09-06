@@ -6,7 +6,7 @@
 [![Angular](https://img.shields.io/badge/Angular-21%2B-red.svg)](https://angular.dev)
 [![License](https://img.shields.io/npm/l/ng-hub-ui-toast.svg)](LICENSE)
 
-Signal-driven Angular toast notification service (Angular 21+) — imperative API, lifecycle observables, progress bar, six positions, and full CSS-variable theming. Built as a standalone Angular service with zero external dependencies.
+Signal-driven Angular toast notification service (Angular 21+) — imperative API, lifecycle observables, progress bar, six positions, and full CSS-variable theming. Built as a standalone Angular service, with no external dependency beyond `ng-hub-ui-utils`.
 
 ## Documentation and Live Examples
 
@@ -49,7 +49,7 @@ This library is part of the **ng-hub-ui** ecosystem:
 ### 1. Install
 
 ```bash
-npm install ng-hub-ui-toast
+npm install ng-hub-ui-toast ng-hub-ui-utils
 ```
 
 > **Theming (recommended):** install the shared design tokens so toasts —
@@ -97,7 +97,7 @@ export class SaveComponent {
 
 ## 📦 Description
 
-`ng-hub-ui-toast` is a zero-dependency notification service for Angular 21+ standalone apps. Call `ToastService.success()`, `.error()`, `.warning()` or `.info()` from any component or service; the overlay container is lazily mounted the first time a notification fires. Each call returns a `HubToastRef` with `onShown`, `onHidden` and `onTap` observables plus `manualClose()` / `resetTimeout()`.
+`ng-hub-ui-toast` is a notification service for Angular 21+ standalone apps whose only non-Angular peer is `ng-hub-ui-utils`. Call `ToastService.success()`, `.error()`, `.warning()` or `.info()` from any component or service; the overlay container is lazily mounted the first time a notification fires. Each call returns a `HubToastRef` with `onShown`, `onHidden` and `onTap` observables plus `manualClose()` / `resetTimeout()`.
 
 ## 🎯 Features
 
@@ -108,7 +108,7 @@ export class SaveComponent {
 - **Six positions** — top/bottom × right/left/center.
 - **Progress bar & close button** — built-in configurable dismiss controls.
 - **CSS variable theming** — every colour, radius, shadow and dimension is a `--hub-toast-*` token.
-- **Built-in semantic types** — `success`, `error`, `warning`, `info` each resolve the matching `--hub-sys-color-*` DS accent family automatically.
+- **Built-in semantic types** — `success`, `error`, `warning` and `info` are the typed shorthands; the stylesheet also maps `primary`, `secondary`, `neutral`, `light` and `dark`, reached by passing the name to `show()`. Each resolves the matching `--hub-sys-color-*` DS accent family automatically (`error` maps to the DS `danger` family).
 - **Custom types** — pass any string to `show()` and drive the accent with your own `--hub-toast-accent` override.
 - **Capacity & deduplication** — `maxOpened` caps the stack; `autoDismiss` removes the oldest; `preventDuplicates` silences repeats.
 
@@ -125,11 +125,12 @@ All options are optional and merge over the built-in defaults.
 | `timeOut` | `number` | `5000` | Auto-dismiss delay (ms). `0` = persistent. |
 | `extendedTimeOut` | `number` | `2500` | Extra ms added while the user hovers. |
 | `closeButton` | `boolean` | `true` | Show a × close button. |
+| `closeButtonAriaLabel` | `string` | `'Close'` | Accessible name of the close button. Translate it for non-English applications. |
 | `progressBar` | `boolean` | `false` | Show a countdown progress bar. |
 | `tapToDismiss` | `boolean` | `true` | Dismiss on click. |
 | `disableTimeOut` | `boolean \| 'timeOut' \| 'extendedTimeOut'` | `false` | Disable the auto-dismiss timer. |
 | `newestOnTop` | `boolean` | `true` | Stack newest toasts at the top. |
-| `positionClass` | `HubToastPosition` | `'toast-top-right'` | Container position on screen. |
+| `positionClass` | `HubToastPosition \| string` | `'toast-top-right'` | Container position on screen. |
 | `maxOpened` | `number` | `0` | Max simultaneous toasts (`0` = unlimited). |
 | `autoDismiss` | `boolean` | `false` | Auto-remove oldest when `maxOpened` is reached. |
 | `preventDuplicates` | `boolean` | `false` | Drop new toasts with a matching visible message. |
@@ -137,6 +138,19 @@ All options are optional and merge over the built-in defaults.
 ---
 
 ## 🪄 API Reference
+
+### Public exports
+
+| Export | Kind | Purpose |
+|---|---|---|
+| `ToastService` | service | Imperative entry point: `success()`, `error()`, `warning()`, `info()`, `show()`, `remove()`, `clear()` and the `toasts` signal. |
+| `provideToast(config?)` | provider function | Registers the library and sets the global defaults. |
+| `ToastConfigService` | service | Resolves one toast's config (built-in defaults ← `provideToast()` override ← per-call override). Injected by `ToastService`; inject it yourself to read `defaults`. |
+| `HUB_TOAST_CONFIG` | `InjectionToken<Partial<HubToastConfig>>` | The token `provideToast()` fills. Provide it directly when the defaults come from somewhere else (a route provider, a factory). |
+| `HUB_TOAST_DEFAULT_CONFIG` | `HubToastConfig` | The built-in defaults, exported so you can read or spread them. |
+| `ToastComponent` | component (`hub-toast`) | Renders a single toast. Instantiated by the container — exported for tests and for rendering a toast outside the overlay. |
+| `ToastContainerComponent` | component (`hub-toast-container`) | The overlay stack. Mounted on `document.body` by `ToastService`; never declared in a user template. |
+| `HubToastRef`, `HubToastConfig`, `HubToastType`, `HubToastData`, `HubToastPosition` | types | The public type surface. |
 
 ### `ToastService`
 
@@ -163,6 +177,8 @@ interface HubToastRef {
     resetTimeout(): void;                  // restarts the auto-dismiss timer from zero
 }
 ```
+
+All three observables complete when the toast closes, so a plain `subscribe()` tears itself down — no `takeUntil` and no manual `unsubscribe()` are needed.
 
 ### Lifecycle example
 
@@ -216,11 +232,22 @@ Every visual detail is controlled by `--hub-toast-*` CSS custom properties.
 | `--hub-toast-gap` | `var(--hub-ref-space-1, 0.25rem)` | Gap between title and message. |
 | `--hub-toast-font-size` | `var(--hub-ref-font-size-base, 1rem)` | Message font size. |
 | `--hub-toast-title-font-size` | `var(--hub-ref-font-size-base, 1rem)` | Title font size. |
-| `--hub-toast-title-font-weight` | `600` | Title font weight. |
+| `--hub-toast-title-font-weight` | `var(--hub-ref-font-weight-semibold, 600)` | Title font weight. |
 | `--hub-toast-progress-height` | `0.25rem` | Progress bar height. |
 | `--hub-toast-progress-bg` | `color-mix(in oklch, var(--hub-toast-accent) 30%, transparent)` | Progress bar colour. |
 | `--hub-toast-close-opacity` | `0.5` | Close button opacity. |
 | `--hub-toast-close-opacity-hover` | `1` | Close button hover opacity. |
+
+### Accent roles
+
+Derived from the single `--hub-toast-accent` slot: re-base the accent — with a `data-type`,
+with the `hub-toast-theme()` mixin or by hand — and the three roles recompute at runtime.
+
+| Variable | Default | Description |
+|---|---|---|
+| `--hub-toast-accent-subtle` | `color-mix(in oklch, var(--hub-toast-accent) 12%, var(--hub-sys-surface-page, #ffffff))` | Tinted surface a `data-type` toast paints as its background. |
+| `--hub-toast-accent-emphasis` | `color-mix(in oklch, var(--hub-toast-accent) 80%, var(--hub-sys-color-ink, #212529))` | Text colour of a `data-type` toast. |
+| `--hub-toast-accent-on` | `oklch(from var(--hub-toast-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h)` | Contrast colour for anything drawn ON the accent; the grayscale flip follows the accent's own lightness. |
 
 ### Container
 
@@ -282,9 +309,14 @@ hub-toast[data-type='offline'] {
 ```json
 {
     "@angular/common": ">=21.0.0",
-    "@angular/core": ">=21.0.0"
+    "@angular/core": ">=21.0.0",
+    "ng-hub-ui-utils": ">=22.7.0"
 }
 ```
+
+`ng-hub-ui-utils` is where `resolveHubAccent()` lives, which the toast uses to resolve a
+custom `type` into an accent colour. `ng add ng-hub-ui` installs it for you; a manual
+`npm install` has to add it explicitly.
 
 ---
 

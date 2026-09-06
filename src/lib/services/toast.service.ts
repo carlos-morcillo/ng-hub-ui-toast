@@ -116,7 +116,8 @@ export class ToastService {
 			config: resolved,
 			onShown$: new Subject<void>(),
 			onHidden$: new Subject<void>(),
-			onTap$: new Subject<void>()
+			onTap$: new Subject<void>(),
+			restartToken: signal(0)
 		};
 
 		if (resolved.newestOnTop) {
@@ -140,10 +141,7 @@ export class ToastService {
 
 	/** Removes all active toasts immediately. */
 	clear(): void {
-		this.toasts().forEach((t) => {
-			t.onHidden$.next();
-			t.onHidden$.complete();
-		});
+		this.toasts().forEach((t) => this._endLifecycle(t));
 		this.toasts.set([]);
 		this._syncContainer();
 	}
@@ -153,11 +151,23 @@ export class ToastService {
 	private _removeById(toastId: number): void {
 		const toast = this.toasts().find((t) => t.toastId === toastId);
 		if (toast) {
-			toast.onHidden$.next();
-			toast.onHidden$.complete();
+			this._endLifecycle(toast);
 			this.toasts.update((list) => list.filter((t) => t.toastId !== toastId));
 			this._syncContainer();
 		}
+	}
+
+	/**
+	 * Closes the lifecycle of a toast that is leaving: `onHidden$` fires and every
+	 * subject completes. A gone toast can never emit again, so leaving `onShown$`
+	 * or `onTap$` open would keep a consumer's subscription — and the toast behind
+	 * it — alive for the rest of the session, with no teardown signal to react to.
+	 */
+	private _endLifecycle(toast: HubToastData): void {
+		toast.onHidden$.next();
+		toast.onHidden$.complete();
+		toast.onShown$.complete();
+		toast.onTap$.complete();
 	}
 
 	private _refForExisting(message: string, type: string): HubToastRef {
@@ -178,7 +188,7 @@ export class ToastService {
 			resetTimeout() {
 				const toast = svc.toasts().find((t) => t.toastId === data.toastId);
 				if (toast) {
-					toast.onShown$.next();
+					toast.restartToken.update((token) => token + 1);
 				}
 			}
 		};

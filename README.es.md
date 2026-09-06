@@ -6,7 +6,7 @@
 [![Angular](https://img.shields.io/badge/Angular-21%2B-red.svg)](https://angular.dev)
 [![License](https://img.shields.io/npm/l/ng-hub-ui-toast.svg)](LICENSE)
 
-Servicio de notificaciones toast para Angular standalone (Angular 21+) — API imperativa, observables de ciclo de vida, barra de progreso, seis posiciones y tematización completa con CSS variables. Sin dependencias externas.
+Servicio de notificaciones toast para Angular standalone (Angular 21+) — API imperativa, observables de ciclo de vida, barra de progreso, seis posiciones y tematización completa con CSS variables. Sin más dependencia externa que `ng-hub-ui-utils`.
 
 ## Documentación y ejemplos en vivo
 
@@ -48,7 +48,7 @@ Esta biblioteca forma parte del ecosistema **ng-hub-ui**:
 ### 1. Instalar
 
 ```bash
-npm install ng-hub-ui-toast
+npm install ng-hub-ui-toast ng-hub-ui-utils
 ```
 
 > **Tematización (recomendado):** instala los tokens de diseño compartidos para que los toasts — y todas las demás bibliotecas ng-hub-ui — usen la misma paleta y modo oscuro:
@@ -94,7 +94,7 @@ export class SaveComponent {
 
 ## 📦 Descripción
 
-`ng-hub-ui-toast` es un servicio de notificaciones sin dependencias externas para Angular 21+ standalone. Llama a `ToastService.success()`, `.error()`, `.warning()` o `.info()` desde cualquier componente o servicio; el contenedor overlay se monta de forma lazy la primera vez que se lanza una notificación. Cada llamada devuelve un `HubToastRef` con observables `onShown`, `onHidden` y `onTap`, más `manualClose()` / `resetTimeout()`.
+`ng-hub-ui-toast` es un servicio de notificaciones para Angular 21+ standalone cuya única dependencia entre pares ajena a Angular es `ng-hub-ui-utils`. Llama a `ToastService.success()`, `.error()`, `.warning()` o `.info()` desde cualquier componente o servicio; el contenedor overlay se monta de forma lazy la primera vez que se lanza una notificación. Cada llamada devuelve un `HubToastRef` con observables `onShown`, `onHidden` y `onTap`, más `manualClose()` / `resetTimeout()`.
 
 ## 🎯 Características
 
@@ -105,7 +105,7 @@ export class SaveComponent {
 - **Seis posiciones** — superior/inferior × derecha/izquierda/centro.
 - **Barra de progreso y botón de cierre** — controles de dismiss configurables.
 - **Tematización con CSS variables** — cada color, radio, sombra y dimensión es un token `--hub-toast-*`.
-- **Tipos semánticos integrados** — `success`, `error`, `warning`, `info` resuelven automáticamente la familia de acento `--hub-sys-color-*` del DS.
+- **Tipos semánticos integrados** — `success`, `error`, `warning` e `info` son los atajos tipados; la hoja de estilos mapea además `primary`, `secondary`, `neutral`, `light` y `dark`, a los que se llega pasando el nombre a `show()`. Cada uno resuelve automáticamente la familia de acento `--hub-sys-color-*` del DS (`error` se mapea a la familia `danger`).
 - **Tipos personalizados** — pasa cualquier string a `show()` y controla el acento con tu propio `--hub-toast-accent`.
 - **Capacidad y deduplicación** — `maxOpened` limita el stack; `autoDismiss` elimina el más antiguo; `preventDuplicates` silencia duplicados.
 
@@ -122,11 +122,12 @@ Todas las opciones son opcionales y se fusionan sobre los valores por defecto in
 | `timeOut` | `number` | `5000` | Tiempo antes del auto-dismiss (ms). `0` = persistente. |
 | `extendedTimeOut` | `number` | `2500` | Ms extra mientras el usuario tiene el cursor encima. |
 | `closeButton` | `boolean` | `true` | Mostrar botón × de cierre. |
+| `closeButtonAriaLabel` | `string` | `'Close'` | Nombre accesible del botón de cierre. Tradúcelo en aplicaciones que no estén en inglés. |
 | `progressBar` | `boolean` | `false` | Mostrar barra de progreso de countdown. |
 | `tapToDismiss` | `boolean` | `true` | Cerrar al hacer click. |
 | `disableTimeOut` | `boolean \| 'timeOut' \| 'extendedTimeOut'` | `false` | Desactivar el temporizador de auto-dismiss. |
 | `newestOnTop` | `boolean` | `true` | Los toasts más nuevos aparecen arriba del stack. |
-| `positionClass` | `HubToastPosition` | `'toast-top-right'` | Posición del contenedor en pantalla. |
+| `positionClass` | `HubToastPosition \| string` | `'toast-top-right'` | Posición del contenedor en pantalla. |
 | `maxOpened` | `number` | `0` | Máximo de toasts simultáneos (`0` = ilimitado). |
 | `autoDismiss` | `boolean` | `false` | Eliminar el más antiguo cuando se alcanza `maxOpened`. |
 | `preventDuplicates` | `boolean` | `false` | Ignorar nuevos toasts con un mensaje ya visible. |
@@ -134,6 +135,19 @@ Todas las opciones son opcionales y se fusionan sobre los valores por defecto in
 ---
 
 ## 🪄 Referencia de API
+
+### Exportaciones públicas
+
+| Exportación | Tipo | Para qué sirve |
+|---|---|---|
+| `ToastService` | servicio | Punto de entrada imperativo: `success()`, `error()`, `warning()`, `info()`, `show()`, `remove()`, `clear()` y el signal `toasts`. |
+| `provideToast(config?)` | función provider | Registra la biblioteca y fija los valores por defecto globales. |
+| `ToastConfigService` | servicio | Resuelve la configuración de cada toast (valores integrados ← override de `provideToast()` ← override por llamada). Lo inyecta `ToastService`; inyéctalo tú para leer `defaults`. |
+| `HUB_TOAST_CONFIG` | `InjectionToken<Partial<HubToastConfig>>` | El token que rellena `provideToast()`. Provéelo directamente cuando los valores por defecto vengan de otro sitio (un provider de ruta, una factoría). |
+| `HUB_TOAST_DEFAULT_CONFIG` | `HubToastConfig` | Los valores por defecto integrados, exportados para poder leerlos o extenderlos. |
+| `ToastComponent` | componente (`hub-toast`) | Renderiza un toast individual. Lo instancia el contenedor; se exporta para tests y para renderizar un toast fuera del overlay. |
+| `ToastContainerComponent` | componente (`hub-toast-container`) | La pila del overlay. `ToastService` la monta sobre `document.body`; nunca se declara en una plantilla de usuario. |
+| `HubToastRef`, `HubToastConfig`, `HubToastType`, `HubToastData`, `HubToastPosition` | tipos | La superficie pública de tipos. |
 
 ### `ToastService`
 
@@ -160,6 +174,8 @@ interface HubToastRef {
     resetTimeout(): void;                  // reinicia el temporizador de auto-dismiss
 }
 ```
+
+Los tres observables completan al cerrarse el toast, así que un `subscribe()` normal se libera solo: no hacen falta `takeUntil` ni `unsubscribe()` manual.
 
 ### Ejemplo de ciclo de vida
 
@@ -211,11 +227,23 @@ Todos los detalles visuales se controlan mediante CSS custom properties `--hub-t
 | `--hub-toast-gap` | `var(--hub-ref-space-1, 0.25rem)` | Espacio entre título y mensaje. |
 | `--hub-toast-font-size` | `var(--hub-ref-font-size-base, 1rem)` | Tamaño de fuente del mensaje. |
 | `--hub-toast-title-font-size` | `var(--hub-ref-font-size-base, 1rem)` | Tamaño de fuente del título. |
-| `--hub-toast-title-font-weight` | `600` | Peso de fuente del título. |
+| `--hub-toast-title-font-weight` | `var(--hub-ref-font-weight-semibold, 600)` | Peso de fuente del título. |
 | `--hub-toast-progress-height` | `0.25rem` | Altura de la barra de progreso. |
 | `--hub-toast-progress-bg` | `color-mix(in oklch, var(--hub-toast-accent) 30%, transparent)` | Color de la barra de progreso. |
 | `--hub-toast-close-opacity` | `0.5` | Opacidad del botón de cierre. |
 | `--hub-toast-close-opacity-hover` | `1` | Opacidad del botón de cierre al hacer hover. |
+
+### Roles de acento
+
+Se derivan del único slot `--hub-toast-accent`: si cambias la base del acento — con un
+`data-type`, con el mixin `hub-toast-theme()` o a mano — los tres roles se recalculan en
+tiempo de ejecución.
+
+| Variable | Por defecto | Descripción |
+|---|---|---|
+| `--hub-toast-accent-subtle` | `color-mix(in oklch, var(--hub-toast-accent) 12%, var(--hub-sys-surface-page, #ffffff))` | Superficie tintada que un toast con `data-type` usa como fondo. |
+| `--hub-toast-accent-emphasis` | `color-mix(in oklch, var(--hub-toast-accent) 80%, var(--hub-sys-color-ink, #212529))` | Color del texto de un toast con `data-type`. |
+| `--hub-toast-accent-on` | `oklch(from var(--hub-toast-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h)` | Color de contraste para lo que se dibuja SOBRE el acento; el salto a blanco o negro lo decide la luminosidad del propio acento. |
 
 ### Contenedor
 
@@ -275,9 +303,14 @@ hub-toast[data-type='offline'] {
 ```json
 {
     "@angular/common": ">=21.0.0",
-    "@angular/core": ">=21.0.0"
+    "@angular/core": ">=21.0.0",
+    "ng-hub-ui-utils": ">=22.7.0"
 }
 ```
+
+`ng-hub-ui-utils` es donde vive `resolveHubAccent()`, la función con la que el toast
+resuelve un `type` personalizado en un color de acento. `ng add ng-hub-ui` la instala por ti;
+un `npm install` manual tiene que añadirla de forma explícita.
 
 ---
 

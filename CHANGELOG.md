@@ -1,5 +1,54 @@
 # ng-hub-ui-toast Changelog
 
+## [22.8.0] - 2026-09-06
+
+### Added
+
+- **The close button's accessible name is now a config option, `closeButtonAriaLabel`.** The `×`
+  glyph is decorative, so that name was the only thing a screen reader had to announce the toast's
+  single control — and it was the English literal `Close`, frozen in the template, unreachable from
+  `provideToast()` or a per-call config. A library shipped to applications that are not in English
+  cannot hardcode a user-facing string.
+
+- **`FUNCTIONALITIES.md`.** Nine sibling libraries carry one and the repository's own checklist
+  asks for it on every change; toast had none, so nothing recorded which parts of the API a
+  reader of the docs can actually operate and which are only prose.
+
+### Changed
+
+- **`HubToastConfig` now carries a required `closeButtonAriaLabel`.** Only code that builds a full
+  `HubToastConfig` literal by hand is affected — everything that goes through `provideToast()` or a
+  per-call override keeps compiling. See `BREAKING_CHANGES.md`.
+
+- **`HubToastData` now carries a required `restartToken` signal.** The data object keeps its
+  identity for the whole life of a toast, so nothing in it could tell the rendered component to
+  start its countdown over; this signal is that channel. Only code that builds a `HubToastData`
+  literal by hand is affected — see `BREAKING_CHANGES.md`.
+
+### Fixed
+
+- **A closing toast now completes its three lifecycle observables, not just `onHidden`.** `onShown`
+  and `onTap` were left open on a toast that no longer existed, so a consumer who subscribed without
+  a `takeUntil` kept the subscription — and the toast data behind it — alive for the rest of the
+  session, with no completion to hang a teardown on. Both `remove()` and `clear()` now close the
+  whole lifecycle.
+
+- **The documentation no longer describes a library that does not exist.** `README.md` and
+  `README.es.md` sold the package as having zero external dependencies and listed only the two
+  Angular peers, so anyone installing by hand — rather than through `ng add ng-hub-ui` — got a
+  module-not-found on `resolveHubAccent` the first time a toast fired. They also gave
+  `--hub-toast-title-font-weight` as a bare `600` when the code routes it through
+  `--hub-ref-font-weight-semibold`, typed `positionClass` as `HubToastPosition` when it accepts
+  any string, named four semantic types where the stylesheet maps nine, omitted the three derived
+  accent roles, and documented two of the eight public exports. `BREAKING_CHANGES.md` was missing
+  the 22.3.0 `--hub-toast-container-z-index` → `--hub-toast-container-zindex` rename, which is the
+  one kind of change this file exists to announce — a renamed custom property fails silently.
+- **`HubToastRef.resetTimeout()` restarts the auto-dismiss countdown, as its documentation always
+  promised.** It used to re-emit `onShown$` and touch no timer state at all, so a caller who wanted
+  to keep a toast on screen a while longer had no way to do it — the toast still vanished on its
+  original schedule, and the spurious emission also broke the "fires once" contract of `onShown`.
+  A toast configured with `disableTimeOut` stays persistent, as before.
+
 ## [22.7.2] - 2026-09-01
 
 ### Changed
@@ -40,7 +89,7 @@
 
 ### Added
 
-- **NEW peer dependency: `ng-hub-ui-utils` `>=22.7.0`.** Consumers must have `ng-hub-ui-utils` installed alongside this library (it is where `resolveHubAccent` lives). Users installing via `ng add ng-hub-ui-installer` get it automatically; manual installs need `npm i ng-hub-ui-utils`.
+- **NEW peer dependency: `ng-hub-ui-utils` `>=22.7.0`.** Consumers must have `ng-hub-ui-utils` installed alongside this library (it is where `resolveHubAccent` lives). Users installing via `ng add ng-hub-ui` get it automatically; manual installs need `npm i ng-hub-ui-utils`.
 
 ## [22.5.2] - 2026-07-28
 

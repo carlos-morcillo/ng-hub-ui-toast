@@ -6,7 +6,12 @@
 </div>
 
 @if (data().config.closeButton) {
-	<button type="button" class="hub-toast__close" aria-label="Close" (click)="onClose($event)">
+	<button
+		type="button"
+		class="hub-toast__close"
+		[attr.aria-label]="data().config.closeButtonAriaLabel"
+		(click)="onClose($event)"
+	>
 		<span aria-hidden="true">&times;</span>
 	</button>
 }

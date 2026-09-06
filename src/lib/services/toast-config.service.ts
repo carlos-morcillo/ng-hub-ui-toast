@@ -6,6 +6,7 @@ export const HUB_TOAST_DEFAULT_CONFIG: HubToastConfig = {
 	timeOut: 5000,
 	extendedTimeOut: 2500,
 	closeButton: true,
+	closeButtonAriaLabel: 'Close',
 	progressBar: false,
 	tapToDismiss: true,
 	disableTimeOut: false,

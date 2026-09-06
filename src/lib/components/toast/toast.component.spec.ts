@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ComponentRef } from '@angular/core';
+import { ComponentRef, signal } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { Subject } from 'rxjs';
 import { ToastComponent } from './toast.component';
@@ -16,6 +16,7 @@ function makeToastData(overrides: Partial<HubToastData> = {}): HubToastData {
 		onShown$: new Subject<void>(),
 		onHidden$: new Subject<void>(),
 		onTap$: new Subject<void>(),
+		restartToken: signal(0),
 		...overrides
 	};
 }
@@ -34,6 +35,10 @@ describe('ToastComponent', () => {
 		fixture = TestBed.createComponent(ToastComponent);
 		component = fixture.componentInstance;
 		componentRef = fixture.componentRef;
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
 	});
 
 	it('should create', () => {
@@ -60,6 +65,25 @@ describe('ToastComponent', () => {
 		expect(component.accentToken()).toBe('#ff0000');
 	});
 
+	it('names the close button with the label the config carries', () => {
+		componentRef.setInput(
+			'data',
+			makeToastData({ config: { ...HUB_TOAST_DEFAULT_CONFIG, closeButton: true, closeButtonAriaLabel: 'Cerrar' } })
+		);
+		fixture.detectChanges();
+
+		const closeButton = fixture.nativeElement.querySelector('.hub-toast__close') as HTMLButtonElement;
+		expect(closeButton.getAttribute('aria-label')).toBe('Cerrar');
+	});
+
+	it('falls back to the default English label when the config does not override it', () => {
+		componentRef.setInput('data', makeToastData({ config: { ...HUB_TOAST_DEFAULT_CONFIG, closeButton: true } }));
+		fixture.detectChanges();
+
+		const closeButton = fixture.nativeElement.querySelector('.hub-toast__close') as HTMLButtonElement;
+		expect(closeButton.getAttribute('aria-label')).toBe('Close');
+	});
+
 	it('emits closed output on tap when tapToDismiss is true', () => {
 		const data = makeToastData({ config: { ...HUB_TOAST_DEFAULT_CONFIG, tapToDismiss: true } });
 		componentRef.setInput('data', data);
@@ -77,6 +101,42 @@ describe('ToastComponent', () => {
 		const closedSpy = vi.fn();
 		component.closed.subscribe(closedSpy);
 		component.onTap();
+		expect(closedSpy).not.toHaveBeenCalled();
+	});
+
+	it('bumping restartToken counts the full timeOut again from zero', () => {
+		vi.useFakeTimers();
+		const data = makeToastData({ config: { ...HUB_TOAST_DEFAULT_CONFIG, timeOut: 3000 } });
+		componentRef.setInput('data', data);
+		fixture.detectChanges();
+		const closedSpy = vi.fn();
+		component.closed.subscribe(closedSpy);
+
+		vi.advanceTimersByTime(2000);
+		data.restartToken.update((token) => token + 1);
+		fixture.detectChanges();
+
+		// 4000 ms after the toast appeared: without the restart it would already be gone.
+		vi.advanceTimersByTime(2000);
+		expect(closedSpy).not.toHaveBeenCalled();
+
+		// 3000 ms after the restart: the full timeOut has elapsed again.
+		vi.advanceTimersByTime(1000);
+		expect(closedSpy).toHaveBeenCalledWith(1);
+	});
+
+	it('bumping restartToken keeps a toast with auto-dismiss disabled persistent', () => {
+		vi.useFakeTimers();
+		const data = makeToastData({ config: { ...HUB_TOAST_DEFAULT_CONFIG, timeOut: 3000, disableTimeOut: true } });
+		componentRef.setInput('data', data);
+		fixture.detectChanges();
+		const closedSpy = vi.fn();
+		component.closed.subscribe(closedSpy);
+
+		data.restartToken.update((token) => token + 1);
+		fixture.detectChanges();
+
+		vi.advanceTimersByTime(10_000);
 		expect(closedSpy).not.toHaveBeenCalled();
 	});
 });

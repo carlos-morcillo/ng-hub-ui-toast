@@ -1,3 +1,4 @@
+import type { WritableSignal } from '@angular/core';
 import { Subject } from 'rxjs';
 
 /**
@@ -28,6 +29,13 @@ export interface HubToastConfig {
 	extendedTimeOut: number;
 	/** Show a close button. @default true */
 	closeButton: boolean;
+	/**
+	 * Accessible name of the close button. The `×` glyph is decorative, so this
+	 * string is the only name a screen reader has for the toast's single control;
+	 * applications that are not in English must be able to translate it.
+	 * @default 'Close'
+	 */
+	closeButtonAriaLabel: string;
 	/** Show a progress bar counting down to dismissal. @default false */
 	progressBar: boolean;
 	/** Close on click anywhere on the toast. @default true */
@@ -72,11 +80,21 @@ export interface HubToastData {
 	onHidden$: Subject<void>;
 	/** Subject fired when the user taps the toast. */
 	onTap$: Subject<void>;
+	/**
+	 * Restart nonce for the auto-dismiss countdown, bumped by
+	 * {@link HubToastRef.resetTimeout}. The data object keeps its identity for
+	 * the whole life of the toast, so a signal is what carries the order from
+	 * the service to the rendered component, whose timer effect reads it.
+	 */
+	restartToken: WritableSignal<number>;
 }
 
 /**
  * Handle returned to callers of `ToastService`. Provides reactive
  * observables for the toast lifecycle and imperative control methods.
+ *
+ * The three observables complete when the toast closes, so a subscription
+ * taken on a handle releases itself without an explicit teardown.
  */
 export interface HubToastRef {
 	/** Unique id of this toast instance. */

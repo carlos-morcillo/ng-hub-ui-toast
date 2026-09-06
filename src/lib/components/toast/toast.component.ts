@@ -66,7 +66,10 @@ export class ToastComponent implements OnDestroy {
 
 	constructor() {
 		effect(() => {
-			const cfg = this.data().config;
+			const data = this.data();
+			// Read as a dependency: resetTimeout() bumps it to start the countdown over.
+			data.restartToken();
+			const cfg = data.config;
 			this._clearTimers();
 			if (cfg.disableTimeOut === true || cfg.disableTimeOut === 'timeOut') {
 				return;

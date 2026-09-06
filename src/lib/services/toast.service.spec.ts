@@ -83,4 +83,54 @@ describe('ToastService', () => {
 		ref.manualClose();
 		expect(service.toasts().length).toBe(0);
 	});
+
+	it('HubToastRef.resetTimeout() bumps the restart token of its toast', () => {
+		const ref = service.success('Still here');
+		const toast = service.toasts()[0];
+		const before = toast.restartToken();
+		ref.resetTimeout();
+		expect(toast.restartToken()).toBe(before + 1);
+	});
+
+	it('completes the three lifecycle observables when a toast is removed', () => {
+		const ref = service.success('Bye');
+		const completed = { shown: vi.fn(), hidden: vi.fn(), tap: vi.fn() };
+		const subscriptions = [
+			ref.onShown.subscribe({ complete: completed.shown }),
+			ref.onHidden.subscribe({ complete: completed.hidden }),
+			ref.onTap.subscribe({ complete: completed.tap })
+		];
+
+		service.remove(ref.toastId);
+
+		expect(completed.shown).toHaveBeenCalled();
+		expect(completed.hidden).toHaveBeenCalled();
+		expect(completed.tap).toHaveBeenCalled();
+		// A completed source tears its subscribers down: no manual unsubscribe is needed.
+		expect(subscriptions.every((subscription) => subscription.closed)).toBe(true);
+	});
+
+	it('completes the three lifecycle observables of every toast on clear()', () => {
+		const first = service.success('A');
+		const second = service.error('B');
+		const completed = vi.fn();
+		const subscriptions = [first, second].flatMap((ref) => [
+			ref.onShown.subscribe({ complete: completed }),
+			ref.onHidden.subscribe({ complete: completed }),
+			ref.onTap.subscribe({ complete: completed })
+		]);
+
+		service.clear();
+
+		expect(completed).toHaveBeenCalledTimes(6);
+		expect(subscriptions.every((subscription) => subscription.closed)).toBe(true);
+	});
+
+	it('HubToastRef.resetTimeout() does not re-emit onShown', () => {
+		const ref = service.success('Shown once');
+		const shownSpy = vi.fn();
+		ref.onShown.subscribe(shownSpy);
+		ref.resetTimeout();
+		expect(shownSpy).not.toHaveBeenCalled();
+	});
 });
