@@ -47,13 +47,30 @@ export interface HubToastConfig {
 	 * @default false
 	 */
 	disableTimeOut: boolean | 'timeOut' | 'extendedTimeOut';
-	/** Newest toast appears at the top of the stack. @default true */
+	/**
+	 * Newest toast appears at the top of its stack. Regardless of this order, a toast
+	 * that has just opened is always painted above the ones already on screen.
+	 * @default true
+	 */
 	newestOnTop: boolean;
-	/** Container position. @default 'toast-top-right' */
+	/**
+	 * Corner this toast is shown in. Each position gets its own container, mounted the
+	 * first time a toast asks for it, so a toast never moves because of a later one.
+	 * @default 'toast-top-right'
+	 */
 	positionClass: HubToastPosition | string;
-	/** Max simultaneous toasts. 0 = unlimited. @default 0 */
+	/**
+	 * Max simultaneous toasts, counted across every position rather than per corner:
+	 * the cap is on how much of the screen notifications may take, which is not
+	 * divisible by corner. 0 = unlimited.
+	 * @default 0
+	 */
 	maxOpened: number;
-	/** When maxOpened is reached, auto-remove the oldest. @default false */
+	/**
+	 * When maxOpened is reached, auto-remove the oldest toast on screen — which, since
+	 * the cap is global, may be one shown in a different corner.
+	 * @default false
+	 */
 	autoDismiss: boolean;
 	/** Ignore duplicate messages already visible. @default false */
 	preventDuplicates: boolean;

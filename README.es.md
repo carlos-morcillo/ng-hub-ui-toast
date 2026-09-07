@@ -94,20 +94,20 @@ export class SaveComponent {
 
 ## 📦 Descripción
 
-`ng-hub-ui-toast` es un servicio de notificaciones para Angular 21+ standalone cuya única dependencia entre pares ajena a Angular es `ng-hub-ui-utils`. Llama a `ToastService.success()`, `.error()`, `.warning()` o `.info()` desde cualquier componente o servicio; el contenedor overlay se monta de forma lazy la primera vez que se lanza una notificación. Cada llamada devuelve un `HubToastRef` con observables `onShown`, `onHidden` y `onTap`, más `manualClose()` / `resetTimeout()`.
+`ng-hub-ui-toast` es un servicio de notificaciones para Angular 21+ standalone cuya única dependencia entre pares ajena a Angular es `ng-hub-ui-utils`. Llama a `ToastService.success()`, `.error()`, `.warning()` o `.info()` desde cualquier componente o servicio; el contenedor overlay de cada esquina se monta de forma lazy la primera vez que una notificación la pide, de modo que cada posición mantiene su propia pila. Cada llamada devuelve un `HubToastRef` con observables `onShown`, `onHidden` y `onTap`, más `manualClose()` / `resetTimeout()`.
 
 ## 🎯 Características
 
 - **Stack basado en signals** — la lista de toasts activos es un `signal<HubToastData[]>`; compatible con `OnPush` y apps sin zones.
-- **Montaje lazy del contenedor** — `ToastContainerComponent` se añade a `document.body` solo en la primera llamada; nada se ejecuta al arrancar.
+- **Montaje lazy del contenedor, uno por posición** — se añade un `ToastContainerComponent` a `document.body` la primera vez que un toast pide esa esquina; nada se ejecuta al arrancar, y una notificación abierta en una esquina no mueve a las que ya se están viendo en otra.
 - **`HubToastRef`** — observables de ciclo de vida (`onShown`, `onHidden`, `onTap`) y control imperativo (`manualClose()`, `resetTimeout()`).
 - **Overrides por llamada** — define valores globales con `provideToast()` y sobreescríbelos individualmente en cada llamada.
-- **Seis posiciones** — superior/inferior × derecha/izquierda/centro.
+- **Seis posiciones** — superior/inferior × derecha/izquierda/centro, cada una con su contenedor y su propia pila.
 - **Barra de progreso y botón de cierre** — controles de dismiss configurables.
 - **Tematización con CSS variables** — cada color, radio, sombra y dimensión es un token `--hub-toast-*`.
 - **Tipos semánticos integrados** — `success`, `error`, `warning` e `info` son los atajos tipados; la hoja de estilos mapea además `primary`, `secondary`, `neutral`, `light` y `dark`, a los que se llega pasando el nombre a `show()`. Cada uno resuelve automáticamente la familia de acento `--hub-sys-color-*` del DS (`error` se mapea a la familia `danger`).
 - **Tipos personalizados** — pasa cualquier string a `show()` y controla el acento con tu propio `--hub-toast-accent`.
-- **Capacidad y deduplicación** — `maxOpened` limita el stack; `autoDismiss` elimina el más antiguo; `preventDuplicates` silencia duplicados.
+- **Capacidad y deduplicación** — `maxOpened` limita el stack entero, contando todas las posiciones; `autoDismiss` elimina el toast más antiguo en pantalla; `preventDuplicates` silencia duplicados.
 
 ---
 
@@ -126,10 +126,10 @@ Todas las opciones son opcionales y se fusionan sobre los valores por defecto in
 | `progressBar` | `boolean` | `false` | Mostrar barra de progreso de countdown. |
 | `tapToDismiss` | `boolean` | `true` | Cerrar al hacer click. |
 | `disableTimeOut` | `boolean \| 'timeOut' \| 'extendedTimeOut'` | `false` | Desactivar el temporizador de auto-dismiss. |
-| `newestOnTop` | `boolean` | `true` | Los toasts más nuevos aparecen arriba del stack. |
-| `positionClass` | `HubToastPosition \| string` | `'toast-top-right'` | Posición del contenedor en pantalla. |
-| `maxOpened` | `number` | `0` | Máximo de toasts simultáneos (`0` = ilimitado). |
-| `autoDismiss` | `boolean` | `false` | Eliminar el más antiguo cuando se alcanza `maxOpened`. |
+| `newestOnTop` | `boolean` | `true` | Los toasts más nuevos aparecen arriba del stack. En cualquier caso, un toast recién abierto se pinta por encima de los que ya estaban. |
+| `positionClass` | `HubToastPosition \| string` | `'toast-top-right'` | Esquina en la que se muestra este toast. Cada posición tiene su propio contenedor. |
+| `maxOpened` | `number` | `0` | Máximo de toasts simultáneos, **contando todas las posiciones**, no por esquina (`0` = ilimitado). |
+| `autoDismiss` | `boolean` | `false` | Eliminar el toast más antiguo en pantalla al alcanzar `maxOpened`; como el límite es global, puede ser uno de otra esquina. |
 | `preventDuplicates` | `boolean` | `false` | Ignorar nuevos toasts con un mensaje ya visible. |
 
 ---
@@ -146,7 +146,7 @@ Todas las opciones son opcionales y se fusionan sobre los valores por defecto in
 | `HUB_TOAST_CONFIG` | `InjectionToken<Partial<HubToastConfig>>` | El token que rellena `provideToast()`. Provéelo directamente cuando los valores por defecto vengan de otro sitio (un provider de ruta, una factoría). |
 | `HUB_TOAST_DEFAULT_CONFIG` | `HubToastConfig` | Los valores por defecto integrados, exportados para poder leerlos o extenderlos. |
 | `ToastComponent` | componente (`hub-toast`) | Renderiza un toast individual. Lo instancia el contenedor; se exporta para tests y para renderizar un toast fuera del overlay. |
-| `ToastContainerComponent` | componente (`hub-toast-container`) | La pila del overlay. `ToastService` la monta sobre `document.body`; nunca se declara en una plantilla de usuario. |
+| `ToastContainerComponent` | componente (`hub-toast-container`) | La pila del overlay de UNA posición, la que nombra su input `position` (por defecto `'toast-top-right'`). `ToastService` monta uno sobre `document.body` por cada posición en uso; nunca se declara en una plantilla de usuario. |
 | `HubToastRef`, `HubToastConfig`, `HubToastType`, `HubToastData`, `HubToastPosition` | tipos | La superficie pública de tipos. |
 
 ### `ToastService`
@@ -201,6 +201,25 @@ closeBtn.addEventListener('click', () => ref.manualClose());
 
 ```typescript
 this.toast.info('Mensaje', '', { positionClass: 'toast-bottom-center' });
+```
+
+Cada posición tiene su propio `hub-toast-container`, montado la primera vez que un toast pide esa
+esquina y conservado el resto de la sesión. Un toast solo lo renderiza el contenedor de su
+posición, así que abrir una notificación en otro sitio no puede mover a las que ya están en
+pantalla. Dentro de un contenedor, el toast recién abierto se pinta por encima de los que ya
+estaban, diga lo que diga `newestOnTop` sobre el orden visual.
+
+`maxOpened` cuenta **todas** las posiciones: el límite es cuánta pantalla pueden ocupar las
+notificaciones, y eso no se reparte por esquinas, así que con `autoDismiss` un toast de abajo a
+la izquierda puede caer para dejar sitio a uno que llega arriba a la derecha.
+
+Da estilo a los contenedores como `hub-toast-container`, acotando por clase de posición cuando
+solo quieras una esquina:
+
+```css
+hub-toast-container.toast-bottom-center {
+    --hub-toast-container-offset: 2rem;
+}
 ```
 
 ---

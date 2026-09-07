@@ -13,6 +13,13 @@ describe('ToastService', () => {
 		service = TestBed.inject(ToastService);
 	});
 
+	afterEach(async () => {
+		// Containers are mounted from the .then() of a dynamic import, so they can reach
+		// document.body after the test that raised the toast has already finished.
+		await new Promise((resolve) => setTimeout(resolve));
+		document.querySelectorAll('hub-toast-container').forEach((element) => element.remove());
+	});
+
 	it('should be created', () => {
 		expect(service).toBeTruthy();
 	});
@@ -132,5 +139,41 @@ describe('ToastService', () => {
 		ref.onShown.subscribe(shownSpy);
 		ref.resetTimeout();
 		expect(shownSpy).not.toHaveBeenCalled();
+	});
+
+	describe('container per position', () => {
+		/** Waits for the lazily imported containers to reach the DOM, then returns them. */
+		async function mountedContainers(expected: number): Promise<HTMLElement[]> {
+			await vi.waitFor(() => {
+				expect(document.querySelectorAll('hub-toast-container')).toHaveLength(expected);
+			});
+			return [...document.querySelectorAll<HTMLElement>('hub-toast-container')];
+		}
+
+		it('leaves a toast where it was when the next one opens in another corner', async () => {
+			service.success('Reading this', '', { positionClass: 'toast-top-right', timeOut: 0 });
+			const [topRight] = await mountedContainers(1);
+
+			expect(topRight.classList.contains('toast-top-right')).toBe(true);
+			expect(topRight.querySelectorAll('hub-toast')).toHaveLength(1);
+
+			service.error('Somewhere else', '', { positionClass: 'toast-bottom-left', timeOut: 0 });
+			const containers = await mountedContainers(2);
+
+			expect(topRight.classList.contains('toast-top-right'), 'the first toast kept its corner').toBe(true);
+			expect(topRight.querySelectorAll('hub-toast'), 'and is still the only one in it').toHaveLength(1);
+			expect(containers.map((element) => element.className)).toEqual([
+				expect.stringContaining('toast-top-right'),
+				expect.stringContaining('toast-bottom-left')
+			]);
+		});
+
+		it('reuses the container of a position instead of mounting a second one', async () => {
+			service.success('First', '', { positionClass: 'toast-top-left', timeOut: 0 });
+			service.success('Second', '', { positionClass: 'toast-top-left', timeOut: 0 });
+			const [topLeft] = await mountedContainers(1);
+
+			expect(topLeft.querySelectorAll('hub-toast')).toHaveLength(2);
+		});
 	});
 });

@@ -16,7 +16,8 @@ This table details the functionalities of the `ng-hub-ui-toast` library and indi
 | **Stack control** | `remove(toastId)` | ❌ |
 | | `clear()` | ✅ |
 | **State** | `toasts` signal of the active stack | ❌ |
-| **Mounting** | Container mounted lazily on `document.body` at the first toast | ✅ |
+| **Mounting** | One container per position, mounted lazily on `document.body` the first time that corner is used | ✅ |
+| | A container is reused for every later toast of its position | ✅ |
 | | Mount skipped when the application is already destroyed | ❌ |
 
 ## Toast handle (`HubToastRef`)
@@ -47,15 +48,20 @@ This table details the functionalities of the `ng-hub-ui-toast` library and indi
 | | `progressBar` | ✅ |
 | | `tapToDismiss` | ✅ |
 | **Stack** | `newestOnTop` | ❌ |
-| | `maxOpened` cap | ✅ |
-| | `autoDismiss` (drop the oldest) | ✅ |
+| | A toast that has just opened is painted above the ones already on screen | ❌ |
+| | `maxOpened` cap, counted across every position rather than per corner | ✅ |
+| | `autoDismiss` (drop the oldest toast on screen, wherever it is) | ✅ |
 | | `preventDuplicates` | ✅ |
 | **Placement** | `positionClass` per call | ✅ |
 
 ## Positions
 
+Each position owns a `hub-toast-container` of its own, so toasts in different corners never share
+an element and a new one cannot relocate those already on screen.
+
 | Category | Functionality | Example Covered |
 | :--- | :--- | :---: |
+| **Container** | Two corners open at once keep independent stacks (`ToastContainerComponent.position`) | ✅ |
 | **Top** | `toast-top-right` (default) | ✅ |
 | | `toast-top-left` | ✅ |
 | | `toast-top-center` | ✅ |

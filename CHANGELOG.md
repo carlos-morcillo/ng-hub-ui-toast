@@ -1,5 +1,40 @@
 # ng-hub-ui-toast Changelog
 
+## [22.9.0] - 2026-09-07
+
+### Fixed
+
+- **A new notification no longer relocates the ones already on screen.** There was a single
+  container, and it took its position class from whichever toast happened to be first in the
+  list, so a call with a different `positionClass` dragged every visible toast to the new corner
+  — the ones the user was in the middle of reading included. Each position now has its own
+  container, mounted the first time a toast asks for it, and a toast is only ever rendered by
+  the container of its own corner. This is the arrangement `ngx-toastr` and `react-toastify`
+  have used for years: one overlay per position, created on demand.
+
+- **A toast that has just opened is painted above the ones already there.** With `newestOnTop`
+  the newest toast is rendered first in the DOM, and a first sibling paints underneath the ones
+  that follow it, so an arriving toast slid in beneath its neighbours' shadows. Stacking now
+  follows recency rather than DOM order.
+
+### Changed
+
+- **BREAKING (markup) — the overlay is one container per position, not one container.** Where
+  `document.body` used to hold a single `hub-toast-container` whose class changed as toasts came
+  and went, it now holds one element per position class actually used, each keeping its own
+  corner for good. CSS or tests written around there being exactly one container, or around its
+  class changing, need updating. See `BREAKING_CHANGES.md`.
+
+### Added
+
+- **`ToastContainerComponent` takes a `position` input**, the position class it owns and the only
+  one whose toasts it renders. `ToastService` sets it on mount; it defaults to `toast-top-right`.
+
+- **The documentation says what `maxOpened` counts.** The cap is on the whole stack, not on one
+  corner of it, and `autoDismiss` therefore drops the oldest toast on screen even when that toast
+  is in a different position. Behaviour is unchanged — it was simply impossible for a consumer to
+  know which of the two it was.
+
 ## [22.8.0] - 2026-09-06
 
 ### Added

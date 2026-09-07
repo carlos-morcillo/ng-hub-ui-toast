@@ -1,3 +1,3 @@
 @for (toast of toasts(); track toast.toastId) {
-	<hub-toast [data]="toast" (closed)="onClosed($event)" />
+	<hub-toast [data]="toast" [style.z-index]="stackOrder(toast)" (closed)="onClosed($event)" />
 }

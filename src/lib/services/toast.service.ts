@@ -1,5 +1,6 @@
 import { ApplicationRef, ComponentRef, createComponent, inject, Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
+import type { ToastContainerComponent } from '../components/toast-container/toast-container.component';
 import type { HubToastConfig, HubToastData, HubToastRef, HubToastType } from '../models/toast.types';
 import { ToastConfigService } from './toast-config.service';
 
@@ -8,8 +9,11 @@ let nextId = 0;
 
 /**
  * Core service for displaying toast notifications.
- * Manages the active toast stack as a signal and lazily mounts the
- * container overlay on the first toast call.
+ * Manages the active toast stack as a signal and lazily mounts one container
+ * overlay per position class, the first time a toast asks for that position.
+ *
+ * `maxOpened` caps the stack as a whole, not one corner of it: the cap is on how
+ * much of the screen notifications may occupy, and that is not divisible by corner.
  *
  * @example
  * ```typescript
@@ -28,9 +32,16 @@ export class ToastService {
 	/** Read-only signal of all currently active toasts. */
 	readonly toasts = signal<HubToastData[]>([]);
 
-	private _containerMounted = false;
-	/** Reference to the lazily created container, kept for explicit CD triggers. */
-	private _containerRef: ComponentRef<unknown> | null = null;
+	/**
+	 * One lazily created container per position class in use, kept for explicit CD
+	 * triggers. A single shared container would have to pick one position for every
+	 * toast on screen, so opening a notification in another corner moved the ones
+	 * the user was already reading.
+	 */
+	private readonly _containers = new Map<string, ComponentRef<ToastContainerComponent>>();
+
+	/** Positions whose container is being imported; guards against a double mount. */
+	private readonly _mountingPositions = new Set<string>();
 
 	// ─── Public shorthand methods ───────────────────────────────────────────
 
@@ -126,8 +137,8 @@ export class ToastService {
 			this.toasts.update((list) => [...list, data]);
 		}
 
-		this._ensureContainerMounted();
-		this._syncContainer();
+		this._ensureContainerMounted(resolved.positionClass);
+		this._syncContainers();
 		return this._buildRef(data);
 	}
 
@@ -139,11 +150,11 @@ export class ToastService {
 		this._removeById(toastId);
 	}
 
-	/** Removes all active toasts immediately. */
+	/** Removes all active toasts immediately, in every position. */
 	clear(): void {
 		this.toasts().forEach((t) => this._endLifecycle(t));
 		this.toasts.set([]);
-		this._syncContainer();
+		this._syncContainers();
 	}
 
 	// ─── Internal helpers ────────────────────────────────────────────────────
@@ -153,7 +164,7 @@ export class ToastService {
 		if (toast) {
 			this._endLifecycle(toast);
 			this.toasts.update((list) => list.filter((t) => t.toastId !== toastId));
-			this._syncContainer();
+			this._syncContainers();
 		}
 	}
 
@@ -195,28 +206,33 @@ export class ToastService {
 	}
 
 	/**
-	 * Lazily mounts the `ToastContainerComponent` via Angular's `createComponent`.
-	 * Called on the first toast — subsequent calls are no-ops.
+	 * Lazily mounts the `ToastContainerComponent` that owns `position`, via Angular's
+	 * `createComponent`. Called on every toast — a position already mounted, or already
+	 * being imported, is a no-op. Containers are kept once created: they are inert while
+	 * empty, and re-creating one would cost a fresh import on the next toast of that corner.
+	 *
+	 * @param position - The `positionClass` of the toast that needs a container.
 	 */
-	private _ensureContainerMounted(): void {
-		if (this._containerMounted) {
+	private _ensureContainerMounted(position: string): void {
+		if (this._containers.has(position) || this._mountingPositions.has(position)) {
 			return;
 		}
-		this._containerMounted = true;
+		this._mountingPositions.add(position);
 
 		import('../components/toast-container/toast-container.component').then(({ ToastContainerComponent }) => {
+			this._mountingPositions.delete(position);
 			// The dynamic import resolves on a later microtask, by which time the application may
 			// already be gone — a toast raised just before teardown, a destroyed TestBed, an HMR
 			// reload. Touching the environment injector then throws NG0205.
 			if (this._appRef.destroyed) {
-				this._containerMounted = false;
 				return;
 			}
 
 			const ref = createComponent(ToastContainerComponent, {
 				environmentInjector: this._appRef.injector
 			});
-			this._containerRef = ref;
+			ref.setInput('position', position);
+			this._containers.set(position, ref);
 			this._appRef.attachView(ref.hostView);
 			document.body.appendChild(ref.location.nativeElement);
 			// Initial render: signal may already hold toasts queued before the import resolved.
@@ -225,14 +241,14 @@ export class ToastService {
 	}
 
 	/**
-	 * Explicitly runs change detection on the container.
+	 * Explicitly runs change detection on every mounted container.
 	 *
 	 * Views created via `createComponent` + `attachView` are not reachable by
 	 * Angular's signal-based "mark ancestors dirty" traversal, so they do not
 	 * update automatically when a signal changes. Calling `detectChanges()`
-	 * directly on the container's `ChangeDetectorRef` is the reliable alternative.
+	 * directly on each container's `ChangeDetectorRef` is the reliable alternative.
 	 */
-	private _syncContainer(): void {
-		this._containerRef?.changeDetectorRef.detectChanges();
+	private _syncContainers(): void {
+		this._containers.forEach((ref) => ref.changeDetectorRef.detectChanges());
 	}
 }

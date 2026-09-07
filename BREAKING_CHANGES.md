@@ -1,5 +1,39 @@
 # Breaking Changes — ng-hub-ui-toast
 
+## [22.9.0] - 2026-09-07
+
+### The overlay is one container per position, not a single container
+
+- **Change**: `ToastService` used to mount exactly one `hub-toast-container` on `document.body`
+  and swap its position class as toasts arrived. It now mounts one container per position class
+  actually used — created the first time a toast asks for that corner, and kept for the rest of
+  the session — and each renders only the toasts configured for its own position. Toasts opened
+  in different corners no longer share an element, which is what stopped a new notification from
+  dragging the ones already on screen to its own corner.
+- **Impact**: the markup changed, so anyone styling or querying the overlay is affected.
+  - CSS that assumed a single container — `body > hub-toast-container:only-of-type`,
+    `:last-child`, or a rule that reached the toasts through one specific corner class — now
+    matches a subset of the containers, or none.
+  - Tests or scripts that read `document.querySelector('hub-toast-container')` get the container
+    of the first position mounted, not "the" container; count and query per position instead.
+  - Every container is now created with its corner and keeps it, so a stylesheet keyed on a class
+    that used to change at runtime is now keyed on a class that never does.
+  - `hub-toast` elements carry an inline `z-index` so a toast that has just opened paints above
+    the ones already there. An override needs `!important`, or a rule on the container.
+- **Migration**: style `hub-toast-container` itself, optionally narrowed by its position class
+  (`hub-toast-container.toast-top-right`), and drop any selector that depended on there being one
+  of them. In tests, query all of them and pick by position class.
+
+### `ToastContainerComponent` renders only its own position
+
+- **Change**: the component gained a `position` input — the position class it owns, defaulting to
+  `'toast-top-right'` — and renders only the toasts whose `positionClass` matches it.
+- **Impact**: declaring `<hub-toast-container />` in a template was never supported, but code that
+  did it now shows only the top-right toasts unless it passes `[position]`. Nothing that goes
+  through `ToastService` is affected: the service sets the input on every container it mounts.
+- **Migration**: pass the position you want — `<hub-toast-container position="toast-bottom-left" />`
+  — or, better, let `ToastService` do the mounting.
+
 ## [22.8.0] - 2026-09-06
 ### `HubToastConfig` requires a `closeButtonAriaLabel` string
 

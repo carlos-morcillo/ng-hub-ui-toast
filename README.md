@@ -97,20 +97,20 @@ export class SaveComponent {
 
 ## 📦 Description
 
-`ng-hub-ui-toast` is a notification service for Angular 21+ standalone apps whose only non-Angular peer is `ng-hub-ui-utils`. Call `ToastService.success()`, `.error()`, `.warning()` or `.info()` from any component or service; the overlay container is lazily mounted the first time a notification fires. Each call returns a `HubToastRef` with `onShown`, `onHidden` and `onTap` observables plus `manualClose()` / `resetTimeout()`.
+`ng-hub-ui-toast` is a notification service for Angular 21+ standalone apps whose only non-Angular peer is `ng-hub-ui-utils`. Call `ToastService.success()`, `.error()`, `.warning()` or `.info()` from any component or service; the overlay container for a corner is lazily mounted the first time a notification asks for it, so each position keeps its own stack. Each call returns a `HubToastRef` with `onShown`, `onHidden` and `onTap` observables plus `manualClose()` / `resetTimeout()`.
 
 ## 🎯 Features
 
 - **Signal-driven stack** — the active-toast list is a `signal<HubToastData[]>`; works with `OnPush` and zoneless apps.
-- **Lazy container mounting** — `ToastContainerComponent` is appended to `document.body` only on the first call; nothing runs at startup.
+- **Lazy container mounting, one per position** — a `ToastContainerComponent` is appended to `document.body` the first time a toast asks for that corner; nothing runs at startup, and a notification opened in one corner never moves the ones already showing in another.
 - **`HubToastRef`** — lifecycle observables (`onShown`, `onHidden`, `onTap`) and imperative control (`manualClose()`, `resetTimeout()`).
 - **Per-call config overrides** — set defaults globally with `provideToast()` and override any option individually per call.
-- **Six positions** — top/bottom × right/left/center.
+- **Six positions** — top/bottom × right/left/center, each with its own container and its own stack.
 - **Progress bar & close button** — built-in configurable dismiss controls.
 - **CSS variable theming** — every colour, radius, shadow and dimension is a `--hub-toast-*` token.
 - **Built-in semantic types** — `success`, `error`, `warning` and `info` are the typed shorthands; the stylesheet also maps `primary`, `secondary`, `neutral`, `light` and `dark`, reached by passing the name to `show()`. Each resolves the matching `--hub-sys-color-*` DS accent family automatically (`error` maps to the DS `danger` family).
 - **Custom types** — pass any string to `show()` and drive the accent with your own `--hub-toast-accent` override.
-- **Capacity & deduplication** — `maxOpened` caps the stack; `autoDismiss` removes the oldest; `preventDuplicates` silences repeats.
+- **Capacity & deduplication** — `maxOpened` caps the stack as a whole, across every position; `autoDismiss` removes the oldest toast on screen; `preventDuplicates` silences repeats.
 
 ---
 
@@ -129,10 +129,10 @@ All options are optional and merge over the built-in defaults.
 | `progressBar` | `boolean` | `false` | Show a countdown progress bar. |
 | `tapToDismiss` | `boolean` | `true` | Dismiss on click. |
 | `disableTimeOut` | `boolean \| 'timeOut' \| 'extendedTimeOut'` | `false` | Disable the auto-dismiss timer. |
-| `newestOnTop` | `boolean` | `true` | Stack newest toasts at the top. |
-| `positionClass` | `HubToastPosition \| string` | `'toast-top-right'` | Container position on screen. |
-| `maxOpened` | `number` | `0` | Max simultaneous toasts (`0` = unlimited). |
-| `autoDismiss` | `boolean` | `false` | Auto-remove oldest when `maxOpened` is reached. |
+| `newestOnTop` | `boolean` | `true` | Stack newest toasts at the top. Either way, a toast that has just opened is painted above the ones already there. |
+| `positionClass` | `HubToastPosition \| string` | `'toast-top-right'` | Corner this toast is shown in. Each position has its own container. |
+| `maxOpened` | `number` | `0` | Max simultaneous toasts, **counted across every position**, not per corner (`0` = unlimited). |
+| `autoDismiss` | `boolean` | `false` | Auto-remove the oldest toast on screen when `maxOpened` is reached — which, the cap being global, may be one in another corner. |
 | `preventDuplicates` | `boolean` | `false` | Drop new toasts with a matching visible message. |
 
 ---
@@ -149,7 +149,7 @@ All options are optional and merge over the built-in defaults.
 | `HUB_TOAST_CONFIG` | `InjectionToken<Partial<HubToastConfig>>` | The token `provideToast()` fills. Provide it directly when the defaults come from somewhere else (a route provider, a factory). |
 | `HUB_TOAST_DEFAULT_CONFIG` | `HubToastConfig` | The built-in defaults, exported so you can read or spread them. |
 | `ToastComponent` | component (`hub-toast`) | Renders a single toast. Instantiated by the container — exported for tests and for rendering a toast outside the overlay. |
-| `ToastContainerComponent` | component (`hub-toast-container`) | The overlay stack. Mounted on `document.body` by `ToastService`; never declared in a user template. |
+| `ToastContainerComponent` | component (`hub-toast-container`) | The overlay stack of ONE position, named by its `position` input (default `'toast-top-right'`). `ToastService` mounts one on `document.body` per position in use; never declared in a user template. |
 | `HubToastRef`, `HubToastConfig`, `HubToastType`, `HubToastData`, `HubToastPosition` | types | The public type surface. |
 
 ### `ToastService`
@@ -206,6 +206,25 @@ closeBtn.addEventListener('click', () => ref.manualClose());
 ```typescript
 // per-call override
 this.toast.info('Message', '', { positionClass: 'toast-bottom-center' });
+```
+
+Each position gets its own `hub-toast-container`, mounted the first time a toast asks for that
+corner and kept for the rest of the session. A toast is only ever rendered by the container of
+its own position, so opening a notification somewhere else cannot move the ones already on
+screen. Within a container, a toast that has just opened is painted above the ones already
+there, whatever `newestOnTop` says about the visual order.
+
+`maxOpened` counts across **all** positions — the cap is on how much of the screen notifications
+may take, which is not divisible by corner — so with `autoDismiss` a toast in the bottom-left can
+be dropped to make room for one arriving top-right.
+
+Style the containers as `hub-toast-container`, narrowing by position class when you need only
+one corner:
+
+```css
+hub-toast-container.toast-bottom-center {
+    --hub-toast-container-offset: 2rem;
+}
 ```
 
 ---
