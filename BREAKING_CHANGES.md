@@ -1,6 +1,32 @@
 # Breaking Changes — ng-hub-ui-toast
 
-## [22.9.0] - 2026-09-07
+## [22.10.0] - 2026-09-07
+
+### `HubToastRef` requires a `dropped` boolean
+
+- **Change**: `HubToastRef` gained `dropped: boolean`, which says whether the call opened a
+  notification or was refused because the stack was already at `maxOpened` with `autoDismiss`
+  off. Every handle `ToastService` returns carries it.
+- **Impact**: only code that constructs a `HubToastRef` itself — a test double, a fake
+  `ToastService`, a wrapper that returns its own handle — stops compiling for the missing
+  property. Code that merely receives the handle is unaffected, and so is every existing use of
+  `toastId`, the three observables and the two methods.
+- **Migration**: add `dropped: false` to any hand-built handle that stands for a toast which
+  really opened, and `dropped: true` to one that stands for a refused call.
+
+### A dropped handle now closes its lifecycle immediately
+
+- **Change**: the handle returned when a call is dropped at `maxOpened` used to expose three
+  observables that never emitted and never completed. Now `onHidden` emits once and completes,
+  `onShown` and `onTap` complete without emitting, and `manualClose()` and `resetTimeout()` do
+  nothing.
+- **Impact**: a `subscribe()` on such a handle now receives its `complete` notification, and an
+  `onHidden` subscriber receives one value. Code that counted on nothing ever arriving — a
+  cleanup routine written to run only for toasts that were really shown — now runs at once for
+  a dropped notification too. It is the same thing that already happened for a toast removed by
+  `clear()`.
+- **Migration**: guard on `dropped` where the difference matters: `if (ref.dropped) { return; }`
+  before subscribing, or before treating the notification as having been seen.
 
 ### The overlay is one container per position, not a single container
 
@@ -11,15 +37,15 @@
   in different corners no longer share an element, which is what stopped a new notification from
   dragging the ones already on screen to its own corner.
 - **Impact**: the markup changed, so anyone styling or querying the overlay is affected.
-  - CSS that assumed a single container — `body > hub-toast-container:only-of-type`,
-    `:last-child`, or a rule that reached the toasts through one specific corner class — now
-    matches a subset of the containers, or none.
-  - Tests or scripts that read `document.querySelector('hub-toast-container')` get the container
-    of the first position mounted, not "the" container; count and query per position instead.
-  - Every container is now created with its corner and keeps it, so a stylesheet keyed on a class
-    that used to change at runtime is now keyed on a class that never does.
-  - `hub-toast` elements carry an inline `z-index` so a toast that has just opened paints above
-    the ones already there. An override needs `!important`, or a rule on the container.
+    - CSS that assumed a single container — `body > hub-toast-container:only-of-type`,
+      `:last-child`, or a rule that reached the toasts through one specific corner class — now
+      matches a subset of the containers, or none.
+    - Tests or scripts that read `document.querySelector('hub-toast-container')` get the container
+      of the first position mounted, not "the" container; count and query per position instead.
+    - Every container is now created with its corner and keeps it, so a stylesheet keyed on a class
+      that used to change at runtime is now keyed on a class that never does.
+    - `hub-toast` elements carry an inline `z-index` so a toast that has just opened paints above
+      the ones already there. An override needs `!important`, or a rule on the container.
 - **Migration**: style `hub-toast-container` itself, optionally narrowed by its position class
   (`hub-toast-container.toast-top-right`), and drop any selector that depended on there being one
   of them. In tests, query all of them and pick by position class.
@@ -35,6 +61,7 @@
   — or, better, let `ToastService` do the mounting.
 
 ## [22.8.0] - 2026-09-06
+
 ### `HubToastConfig` requires a `closeButtonAriaLabel` string
 
 - **Change**: `HubToastConfig` gained `closeButtonAriaLabel: string`, the accessible name given to

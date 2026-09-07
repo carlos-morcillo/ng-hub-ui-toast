@@ -1,9 +1,18 @@
 # ng-hub-ui-toast Changelog
 
-## [22.9.0] - 2026-09-07
+## [22.10.0] - 2026-09-07
 
 ### Fixed
 
+- **A notification dropped at `maxOpened` no longer hands back a handle that never says
+  anything.** With the stack full and `autoDismiss` off, the call was refused and the handle
+  returned was built over an empty object: its three lifecycle observables were `undefined`, so
+  each fell back to a brand-new `Subject` that nothing on earth would ever complete or emit.
+  Awaiting the close of that notification — `await firstValueFrom(ref.onHidden)`, the ordinary
+  way of waiting for a toast to go away — waited for the rest of the session, and nothing on the
+  handle said the notification had not even been shown. The handle now closes at once:
+  `onHidden` emits and completes, `onShown` and `onTap` complete without emitting, and
+  `manualClose()` / `resetTimeout()` are no-ops.
 - **A new notification no longer relocates the ones already on screen.** There was a single
   container, and it took its position class from whichever toast happened to be first in the
   list, so a call with a different `positionClass` dragged every visible toast to the new corner
@@ -17,16 +26,12 @@
   that follow it, so an arriving toast slid in beneath its neighbours' shadows. Stacking now
   follows recency rather than DOM order.
 
-### Changed
-
-- **BREAKING (markup) — the overlay is one container per position, not one container.** Where
-  `document.body` used to hold a single `hub-toast-container` whose class changed as toasts came
-  and went, it now holds one element per position class actually used, each keeping its own
-  corner for good. CSS or tests written around there being exactly one container, or around its
-  class changing, need updating. See `BREAKING_CHANGES.md`.
-
 ### Added
 
+- **`HubToastRef.dropped`** — `true` when the call was refused and no toast reached the screen,
+  `false` on every handle that stands for a real notification. `toastId` stays `-1` for a
+  dropped handle, but that was never documented and reads as an implementation detail; `dropped`
+  is the question a caller actually wants to ask.
 - **`ToastContainerComponent` takes a `position` input**, the position class it owns and the only
   one whose toasts it renders. `ToastService` sets it on mount; it defaults to `toast-top-right`.
 
@@ -34,6 +39,17 @@
   corner of it, and `autoDismiss` therefore drops the oldest toast on screen even when that toast
   is in a different position. Behaviour is unchanged — it was simply impossible for a consumer to
   know which of the two it was.
+
+### Changed
+
+- **BREAKING (types) — `HubToastRef` gained a required `dropped: boolean`.** Only code that
+  builds a `HubToastRef` by hand is affected — a test double or a fake service. Everything that
+  takes the handle from `ToastService` keeps compiling. See `BREAKING_CHANGES.md`.
+- **BREAKING (markup) — the overlay is one container per position, not one container.** Where
+  `document.body` used to hold a single `hub-toast-container` whose class changed as toasts came
+  and went, it now holds one element per position class actually used, each keeping its own
+  corner for good. CSS or tests written around there being exactly one container, or around its
+  class changing, need updating. See `BREAKING_CHANGES.md`.
 
 ## [22.8.0] - 2026-09-06
 

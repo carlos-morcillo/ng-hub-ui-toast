@@ -103,7 +103,7 @@ export class SaveComponent {
 
 - **Signal-driven stack** — the active-toast list is a `signal<HubToastData[]>`; works with `OnPush` and zoneless apps.
 - **Lazy container mounting, one per position** — a `ToastContainerComponent` is appended to `document.body` the first time a toast asks for that corner; nothing runs at startup, and a notification opened in one corner never moves the ones already showing in another.
-- **`HubToastRef`** — lifecycle observables (`onShown`, `onHidden`, `onTap`) and imperative control (`manualClose()`, `resetTimeout()`).
+- **`HubToastRef`** — lifecycle observables (`onShown`, `onHidden`, `onTap`), imperative control (`manualClose()`, `resetTimeout()`) and a `dropped` flag that says whether the notification was shown at all.
 - **Per-call config overrides** — set defaults globally with `provideToast()` and override any option individually per call.
 - **Six positions** — top/bottom × right/left/center, each with its own container and its own stack.
 - **Progress bar & close button** — built-in configurable dismiss controls.
@@ -169,7 +169,8 @@ All options are optional and merge over the built-in defaults.
 
 ```typescript
 interface HubToastRef {
-    readonly toastId: number;
+    readonly toastId: number;              // -1 when the notification was dropped
+    readonly dropped: boolean;             // true when it was never shown
     readonly onShown:  Observable<void>;   // fires once when the toast enters the DOM
     readonly onHidden: Observable<void>;   // fires once when the toast leaves the DOM
     readonly onTap:    Observable<void>;   // fires each time the user clicks the toast body
@@ -179,6 +180,22 @@ interface HubToastRef {
 ```
 
 All three observables complete when the toast closes, so a plain `subscribe()` tears itself down — no `takeUntil` and no manual `unsubscribe()` are needed.
+
+#### When the notification is dropped
+
+A call does not always open a toast. With the stack already at `maxOpened` and `autoDismiss` off, the notification is dropped and the handle stands for something that never reached the screen. It still is a handle — the methods are typed to return one — and `dropped` is how you tell the two apart:
+
+```typescript
+const ref = this.toast.info('Sync finished', '', { maxOpened: 3 });
+
+if (ref.dropped) {
+    // The stack was full. Nothing is on screen; log it, or queue it for later.
+}
+
+await firstValueFrom(ref.onHidden); // resolves at once on a dropped handle
+```
+
+A dropped handle is inert: `toastId` is `-1`, `onHidden` emits and completes immediately so waiting for the close resolves instead of hanging for the rest of the session, `onShown` and `onTap` complete without ever emitting, and `manualClose()` and `resetTimeout()` do nothing.
 
 ### Lifecycle example
 

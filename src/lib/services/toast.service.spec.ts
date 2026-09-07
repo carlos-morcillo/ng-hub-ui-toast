@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { firstValueFrom } from 'rxjs';
 import { ToastService } from './toast.service';
 import { provideToast } from './toast-config.service';
 
@@ -174,6 +175,62 @@ describe('ToastService', () => {
 			const [topLeft] = await mountedContainers(1);
 
 			expect(topLeft.querySelectorAll('hub-toast')).toHaveLength(2);
+		});
+	});
+
+	describe('a notification dropped at maxOpened', () => {
+		/** Fills the stack so the next call is the one that gets dropped. */
+		function fillStack(): void {
+			service.success('A', '', { maxOpened: 2 });
+			service.success('B', '', { maxOpened: 2 });
+		}
+
+		it('does not open, and says so on the handle it returns', () => {
+			fillStack();
+
+			const ref = service.success('C', '', { maxOpened: 2 });
+
+			expect(service.toasts()).toHaveLength(2);
+			expect(ref.dropped).toBe(true);
+			expect(ref.toastId).toBe(-1);
+		});
+
+		it('marks the handle of a notification that did open as not dropped', () => {
+			const ref = service.success('A', '', { maxOpened: 2 });
+
+			expect(ref.dropped).toBe(false);
+		});
+
+		it('closes onHidden at once, so a caller awaiting the close is not left waiting', async () => {
+			fillStack();
+			const ref = service.success('C', '', { maxOpened: 2 });
+
+			// Without a real toast behind it this used to hang for the rest of the session.
+			await expect(firstValueFrom(ref.onHidden)).resolves.toBeUndefined();
+		});
+
+		it('completes onShown and onTap without ever emitting them', () => {
+			fillStack();
+			const ref = service.success('C', '', { maxOpened: 2 });
+			const emitted = vi.fn();
+			const completed = { shown: vi.fn(), tap: vi.fn() };
+
+			ref.onShown.subscribe({ next: emitted, complete: completed.shown });
+			ref.onTap.subscribe({ next: emitted, complete: completed.tap });
+
+			expect(emitted).not.toHaveBeenCalled();
+			expect(completed.shown).toHaveBeenCalled();
+			expect(completed.tap).toHaveBeenCalled();
+		});
+
+		it('leaves the stack alone when the dropped handle is closed or reset', () => {
+			fillStack();
+			const ref = service.success('C', '', { maxOpened: 2 });
+
+			ref.manualClose();
+			ref.resetTimeout();
+
+			expect(service.toasts()).toHaveLength(2);
 		});
 	});
 });

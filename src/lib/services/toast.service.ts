@@ -1,5 +1,5 @@
 import { ApplicationRef, ComponentRef, createComponent, inject, Injectable, signal } from '@angular/core';
-import { Subject } from 'rxjs';
+import { EMPTY, of, Subject } from 'rxjs';
 import type { ToastContainerComponent } from '../components/toast-container/toast-container.component';
 import type { HubToastConfig, HubToastData, HubToastRef, HubToastType } from '../models/toast.types';
 import { ToastConfigService } from './toast-config.service';
@@ -115,7 +115,7 @@ export class ToastService {
 				const oldest = resolved.newestOnTop ? this.toasts()[this.toasts().length - 1] : this.toasts()[0];
 				this._removeById(oldest.toastId);
 			} else {
-				return this._buildRef({ toastId: -1 } as any);
+				return this._droppedRef();
 			}
 		}
 
@@ -183,16 +183,41 @@ export class ToastService {
 
 	private _refForExisting(message: string, type: string): HubToastRef {
 		const existing = this.toasts().find((t) => t.message === message && t.type === type);
-		return existing ? this._buildRef(existing) : this._buildRef({ toastId: -1 } as any);
+		return existing ? this._buildRef(existing) : this._droppedRef();
+	}
+
+	/**
+	 * Handle for a notification that was never shown, because the stack was already at
+	 * `maxOpened` and `autoDismiss` is off.
+	 *
+	 * It has to be a handle and not `null`: `show()` and its four shorthands are typed to
+	 * return one, and a consumer chaining off the result would start crashing. So it stands
+	 * for the absence instead — `dropped` tells the caller the notification never reached the
+	 * screen, and the lifecycle closes at once rather than dangling. `onHidden` emits and
+	 * completes so that `await firstValueFrom(ref.onHidden)`, the ordinary way of waiting for
+	 * a notification to go away, resolves instead of waiting for the rest of the session;
+	 * `onShown` and `onTap` complete empty, because neither can ever happen.
+	 */
+	private _droppedRef(): HubToastRef {
+		return {
+			toastId: -1,
+			dropped: true,
+			onShown: EMPTY,
+			onHidden: of(undefined as void),
+			onTap: EMPTY,
+			manualClose() {},
+			resetTimeout() {}
+		};
 	}
 
 	private _buildRef(data: HubToastData): HubToastRef {
 		const svc = this;
 		return {
 			toastId: data.toastId,
-			onShown: data.onShown$?.asObservable() ?? new Subject<void>().asObservable(),
-			onHidden: data.onHidden$?.asObservable() ?? new Subject<void>().asObservable(),
-			onTap: data.onTap$?.asObservable() ?? new Subject<void>().asObservable(),
+			dropped: false,
+			onShown: data.onShown$.asObservable(),
+			onHidden: data.onHidden$.asObservable(),
+			onTap: data.onTap$.asObservable(),
 			manualClose() {
 				svc.remove(data.toastId);
 			},

@@ -25,6 +25,7 @@ This table details the functionalities of the `ng-hub-ui-toast` library and indi
 | Category | Functionality | Example Covered |
 | :--- | :--- | :---: |
 | **Identity** | `toastId` | ✅ |
+| | `dropped` — the notification never opened, because the stack was at `maxOpened` with `autoDismiss` off | ❌ |
 | **Lifecycle** | `onShown` observable | ✅ |
 | | `onHidden` observable | ✅ |
 | | `onTap` observable | ✅ |

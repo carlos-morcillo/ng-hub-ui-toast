@@ -100,7 +100,7 @@ export class SaveComponent {
 
 - **Stack basado en signals** — la lista de toasts activos es un `signal<HubToastData[]>`; compatible con `OnPush` y apps sin zones.
 - **Montaje lazy del contenedor, uno por posición** — se añade un `ToastContainerComponent` a `document.body` la primera vez que un toast pide esa esquina; nada se ejecuta al arrancar, y una notificación abierta en una esquina no mueve a las que ya se están viendo en otra.
-- **`HubToastRef`** — observables de ciclo de vida (`onShown`, `onHidden`, `onTap`) y control imperativo (`manualClose()`, `resetTimeout()`).
+- **`HubToastRef`** — observables de ciclo de vida (`onShown`, `onHidden`, `onTap`), control imperativo (`manualClose()`, `resetTimeout()`) y un indicador `dropped` que dice si la notificación llegó a mostrarse.
 - **Overrides por llamada** — define valores globales con `provideToast()` y sobreescríbelos individualmente en cada llamada.
 - **Seis posiciones** — superior/inferior × derecha/izquierda/centro, cada una con su contenedor y su propia pila.
 - **Barra de progreso y botón de cierre** — controles de dismiss configurables.
@@ -166,7 +166,8 @@ Todas las opciones son opcionales y se fusionan sobre los valores por defecto in
 
 ```typescript
 interface HubToastRef {
-    readonly toastId: number;
+    readonly toastId: number;              // -1 si la notificación se descartó
+    readonly dropped: boolean;             // true si nunca llegó a mostrarse
     readonly onShown:  Observable<void>;   // emite una vez cuando el toast entra en el DOM
     readonly onHidden: Observable<void>;   // emite una vez cuando el toast sale del DOM
     readonly onTap:    Observable<void>;   // emite cada vez que el usuario hace click
@@ -176,6 +177,22 @@ interface HubToastRef {
 ```
 
 Los tres observables completan al cerrarse el toast, así que un `subscribe()` normal se libera solo: no hacen falta `takeUntil` ni `unsubscribe()` manual.
+
+#### Cuando la notificación se descarta
+
+Una llamada no siempre abre un toast. Con la pila ya en `maxOpened` y `autoDismiss` apagado, la notificación se descarta y el handle representa algo que nunca llegó a la pantalla. Sigue siendo un handle —los métodos están tipados para devolver uno— y `dropped` es lo que distingue un caso del otro:
+
+```typescript
+const ref = this.toast.info('Sincronización terminada', '', { maxOpened: 3 });
+
+if (ref.dropped) {
+    // La pila estaba llena. No hay nada en pantalla: regístralo o encólalo para después.
+}
+
+await firstValueFrom(ref.onHidden); // en un handle descartado resuelve al instante
+```
+
+Un handle descartado es inerte: `toastId` vale `-1`, `onHidden` emite y completa de inmediato para que esperar el cierre resuelva en vez de quedarse esperando el resto de la sesión, `onShown` y `onTap` completan sin emitir nunca, y `manualClose()` y `resetTimeout()` no hacen nada.
 
 ### Ejemplo de ciclo de vida
 

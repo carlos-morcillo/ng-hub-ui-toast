@@ -112,10 +112,26 @@ export interface HubToastData {
  *
  * The three observables complete when the toast closes, so a subscription
  * taken on a handle releases itself without an explicit teardown.
+ *
+ * A call is not guaranteed to open a notification: with the stack already at
+ * `maxOpened` and `autoDismiss` off, the call is dropped and the handle stands for
+ * a toast that never reached the screen. {@link HubToastRef.dropped} is how a caller
+ * tells the two apart — see it for what such a handle does.
  */
 export interface HubToastRef {
-	/** Unique id of this toast instance. */
+	/** Unique id of this toast instance, or `-1` when the notification was dropped. */
 	readonly toastId: number;
+	/**
+	 * Whether the notification was dropped instead of shown, which happens when the stack
+	 * is already at `maxOpened` and `autoDismiss` is off.
+	 *
+	 * A dropped handle is inert and says so at once rather than waiting for something that
+	 * will never happen: `onHidden` emits and completes immediately, so awaiting the close
+	 * resolves instead of hanging for the rest of the session; `onShown` and `onTap`
+	 * complete without ever emitting, because neither event can occur; and `manualClose()`
+	 * and `resetTimeout()` do nothing.
+	 */
+	readonly dropped: boolean;
 	/** Emits once when the toast becomes visible. */
 	readonly onShown: import('rxjs').Observable<void>;
 	/** Emits once when the toast is removed from the DOM. */
