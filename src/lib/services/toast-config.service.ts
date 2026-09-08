@@ -39,10 +39,10 @@ export function provideToast(config: Partial<HubToastConfig> = {}): Provider[] {
 
 /**
  * Resolves per-toast config by merging global defaults, the provider override,
- * and any per-call overrides. Injected by `ToastService`.
+ * and any per-call overrides. Injected by `HubToastService`.
  */
 @Injectable({ providedIn: 'root' })
-export class ToastConfigService {
+export class HubToastConfigService {
 	private readonly _override = inject(HUB_TOAST_CONFIG, { optional: true }) ?? {};
 
 	/** Returns the merged global config (default ← provider override). */

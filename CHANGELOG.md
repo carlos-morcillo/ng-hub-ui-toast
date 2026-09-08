@@ -1,5 +1,39 @@
 # ng-hub-ui-toast Changelog
 
+## [22.11.0] - 2026-09-08
+
+### Changed
+
+- **BREAKING — the four exported classes are renamed with the `Hub` prefix.** `ToastService` is
+  now `HubToastService`, `ToastConfigService` is `HubToastConfigService`, `ToastComponent` is
+  `HubToastComponent` and `ToastContainerComponent` is `HubToastContainerComponent`. `ToastService`
+  is the name an application is most likely to give its own notification wrapper, so a library
+  holding it holds something that was never the library's to hold: the file that imports both ends
+  up aliasing its way out of a collision it did not create. The types of this same package —
+  `HubToastConfig`, `HubToastRef`, `HubToastPosition` — already carried the prefix, so the surface
+  was being spelled two ways in one import list. All four old names stay exported as deprecated
+  aliases resolving to the same classes, so injection and providers keep working unchanged, and
+  they are removed in 23.0.0. See `BREAKING_CHANGES.md`.
+
+- **`ng-hub-ui-ds` is declared as an optional peer dependency, `>=22.0.0`.** The stylesheet themes
+  against `--hub-sys-*`, and the manifest never said so: nothing warned that a `ng-hub-ui-ds` older
+  than the `--hub-ref-*` / `--hub-sys-*` architecture would leave the toast on its fallbacks, and a
+  reader of the manifest had no way to learn that the token package is what turns the theme on.
+  `peerDependenciesMeta` marks it optional, so an installation without it stays clean.
+
+### Fixed
+
+- **A toast now keeps its colour when `ng-hub-ui-ds` is not installed.** The nine accent
+  declarations — one per built-in type, plus the `danger` mapping that `error` uses — read
+  `--hub-sys-color-<type>` with no fallback, and they were the only `--hub-sys-*` reads in the
+  sheet without one. Without the token package the read has nothing to resolve to, which makes the
+  whole `--hub-toast-accent` declaration invalid at computed-value time rather than falling back to
+  the neutral accent declared above it; `--hub-toast-bg`, `--hub-toast-color` and
+  `--hub-toast-border` are all mixed from that slot, so `background`, `color` and `border-color`
+  went unset together and a success toast arrived transparent and unbordered. Each type now names
+  the Bootstrap-equivalent colour the rest of this family already uses as its fallback, so a toast
+  with no design system installed degrades to a recognisable colour instead of to no colour at all.
+
 ## [22.10.0] - 2026-09-07
 
 ### Fixed

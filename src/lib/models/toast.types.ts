@@ -78,7 +78,7 @@ export interface HubToastConfig {
 
 /**
  * Internal representation of one active toast.
- * Created by `ToastService` and consumed by `ToastComponent`.
+ * Created by `HubToastService` and consumed by `HubToastComponent`.
  */
 export interface HubToastData {
 	/** Monotonically increasing identifier. */
@@ -107,7 +107,7 @@ export interface HubToastData {
 }
 
 /**
- * Handle returned to callers of `ToastService`. Provides reactive
+ * Handle returned to callers of `HubToastService`. Provides reactive
  * observables for the toast lifecycle and imperative control methods.
  *
  * The three observables complete when the toast closes, so a subscription

@@ -78,11 +78,11 @@ export const appConfig: ApplicationConfig = {
 ### 3. Inyectar y llamar
 
 ```typescript
-import { ToastService } from 'ng-hub-ui-toast';
+import { HubToastService } from 'ng-hub-ui-toast';
 
 @Component({ ... })
 export class SaveComponent {
-    private toast = inject(ToastService);
+    private toast = inject(HubToastService);
 
     save() {
         this.toast.success('Registro guardado.', 'Éxito');
@@ -94,12 +94,12 @@ export class SaveComponent {
 
 ## 📦 Descripción
 
-`ng-hub-ui-toast` es un servicio de notificaciones para Angular 21+ standalone cuya única dependencia entre pares ajena a Angular es `ng-hub-ui-utils`. Llama a `ToastService.success()`, `.error()`, `.warning()` o `.info()` desde cualquier componente o servicio; el contenedor overlay de cada esquina se monta de forma lazy la primera vez que una notificación la pide, de modo que cada posición mantiene su propia pila. Cada llamada devuelve un `HubToastRef` con observables `onShown`, `onHidden` y `onTap`, más `manualClose()` / `resetTimeout()`.
+`ng-hub-ui-toast` es un servicio de notificaciones para Angular 21+ standalone cuya única dependencia entre pares ajena a Angular es `ng-hub-ui-utils`. Llama a `HubToastService.success()`, `.error()`, `.warning()` o `.info()` desde cualquier componente o servicio; el contenedor overlay de cada esquina se monta de forma lazy la primera vez que una notificación la pide, de modo que cada posición mantiene su propia pila. Cada llamada devuelve un `HubToastRef` con observables `onShown`, `onHidden` y `onTap`, más `manualClose()` / `resetTimeout()`.
 
 ## 🎯 Características
 
 - **Stack basado en signals** — la lista de toasts activos es un `signal<HubToastData[]>`; compatible con `OnPush` y apps sin zones.
-- **Montaje lazy del contenedor, uno por posición** — se añade un `ToastContainerComponent` a `document.body` la primera vez que un toast pide esa esquina; nada se ejecuta al arrancar, y una notificación abierta en una esquina no mueve a las que ya se están viendo en otra.
+- **Montaje lazy del contenedor, uno por posición** — se añade un `HubToastContainerComponent` a `document.body` la primera vez que un toast pide esa esquina; nada se ejecuta al arrancar, y una notificación abierta en una esquina no mueve a las que ya se están viendo en otra.
 - **`HubToastRef`** — observables de ciclo de vida (`onShown`, `onHidden`, `onTap`), control imperativo (`manualClose()`, `resetTimeout()`) y un indicador `dropped` que dice si la notificación llegó a mostrarse.
 - **Overrides por llamada** — define valores globales con `provideToast()` y sobreescríbelos individualmente en cada llamada.
 - **Seis posiciones** — superior/inferior × derecha/izquierda/centro, cada una con su contenedor y su propia pila.
@@ -140,16 +140,16 @@ Todas las opciones son opcionales y se fusionan sobre los valores por defecto in
 
 | Exportación | Tipo | Para qué sirve |
 |---|---|---|
-| `ToastService` | servicio | Punto de entrada imperativo: `success()`, `error()`, `warning()`, `info()`, `show()`, `remove()`, `clear()` y el signal `toasts`. |
+| `HubToastService` | servicio | Punto de entrada imperativo: `success()`, `error()`, `warning()`, `info()`, `show()`, `remove()`, `clear()` y el signal `toasts`. |
 | `provideToast(config?)` | función provider | Registra la biblioteca y fija los valores por defecto globales. |
-| `ToastConfigService` | servicio | Resuelve la configuración de cada toast (valores integrados ← override de `provideToast()` ← override por llamada). Lo inyecta `ToastService`; inyéctalo tú para leer `defaults`. |
+| `HubToastConfigService` | servicio | Resuelve la configuración de cada toast (valores integrados ← override de `provideToast()` ← override por llamada). Lo inyecta `HubToastService`; inyéctalo tú para leer `defaults`. |
 | `HUB_TOAST_CONFIG` | `InjectionToken<Partial<HubToastConfig>>` | El token que rellena `provideToast()`. Provéelo directamente cuando los valores por defecto vengan de otro sitio (un provider de ruta, una factoría). |
 | `HUB_TOAST_DEFAULT_CONFIG` | `HubToastConfig` | Los valores por defecto integrados, exportados para poder leerlos o extenderlos. |
-| `ToastComponent` | componente (`hub-toast`) | Renderiza un toast individual. Lo instancia el contenedor; se exporta para tests y para renderizar un toast fuera del overlay. |
-| `ToastContainerComponent` | componente (`hub-toast-container`) | La pila del overlay de UNA posición, la que nombra su input `position` (por defecto `'toast-top-right'`). `ToastService` monta uno sobre `document.body` por cada posición en uso; nunca se declara en una plantilla de usuario. |
+| `HubToastComponent` | componente (`hub-toast`) | Renderiza un toast individual. Lo instancia el contenedor; se exporta para tests y para renderizar un toast fuera del overlay. |
+| `HubToastContainerComponent` | componente (`hub-toast-container`) | La pila del overlay de UNA posición, la que nombra su input `position` (por defecto `'toast-top-right'`). `HubToastService` monta uno sobre `document.body` por cada posición en uso; nunca se declara en una plantilla de usuario. |
 | `HubToastRef`, `HubToastConfig`, `HubToastType`, `HubToastData`, `HubToastPosition` | tipos | La superficie pública de tipos. |
 
-### `ToastService`
+### `HubToastService`
 
 | Método | Firma | Descripción |
 |---|---|---|
@@ -340,6 +340,7 @@ hub-toast[data-type='offline'] {
 {
     "@angular/common": ">=21.0.0",
     "@angular/core": ">=21.0.0",
+    "ng-hub-ui-ds": ">=22.0.0",
     "ng-hub-ui-utils": ">=22.7.0"
 }
 ```
@@ -347,6 +348,11 @@ hub-toast[data-type='offline'] {
 `ng-hub-ui-utils` es donde vive `resolveHubAccent()`, la función con la que el toast
 resuelve un `type` personalizado en un color de acento. `ng add ng-hub-ui` la instala por ti;
 un `npm install` manual tiene que añadirla de forma explícita.
+
+`ng-hub-ui-ds` es **opcional**: instálala para dar al toast la paleta compartida de tokens
+`--hub-sys-*` y el modo oscuro. Sin ella cada lectura de token cae en un valor por defecto
+interno, así que un toast `success` sigue siendo verde — verde de este paquete y no del
+sistema de diseño.
 
 ---
 

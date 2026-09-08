@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import type { HubToastData, HubToastPosition } from '../../models/toast.types';
-import { ToastService } from '../../services/toast.service';
-import { ToastComponent } from '../toast/toast.component';
+import { HubToastService } from '../../services/toast.service';
+import { HubToastComponent } from '../toast/toast.component';
 
 /**
  * Fixed-corner container that renders the toasts of ONE position.
  *
- * `ToastService` mounts one instance per position class actually in use and appends
+ * `HubToastService` mounts one instance per position class actually in use and appends
  * it to `document.body` — never declared in user templates. Each container renders
  * only the toasts whose config names its own position, which is what keeps a
  * notification opened in another corner from relocating the ones already on screen.
@@ -16,14 +16,14 @@ import { ToastComponent } from '../toast/toast.component';
 	templateUrl: './toast-container.component.html',
 	styleUrl: './toast-container.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [ToastComponent],
+	imports: [HubToastComponent],
 	host: {
 		class: 'hub-toast-container',
 		'[class]': 'position()'
 	}
 })
-export class ToastContainerComponent {
-	protected readonly toastService = inject(ToastService);
+export class HubToastContainerComponent {
+	protected readonly toastService = inject(HubToastService);
 
 	/** Position this container owns; also the class that anchors it to its corner. */
 	readonly position = input<HubToastPosition | string>('toast-top-right');
@@ -50,7 +50,7 @@ export class ToastContainerComponent {
 		return this._stackOrder().get(toast.toastId) ?? 1;
 	}
 
-	/** Delegates toast removal to `ToastService`. */
+	/** Delegates toast removal to `HubToastService`. */
 	protected onClosed(toastId: number): void {
 		this.toastService.remove(toastId);
 	}

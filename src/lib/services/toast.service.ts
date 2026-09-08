@@ -1,8 +1,8 @@
 import { ApplicationRef, ComponentRef, createComponent, inject, Injectable, signal } from '@angular/core';
 import { EMPTY, of, Subject } from 'rxjs';
-import type { ToastContainerComponent } from '../components/toast-container/toast-container.component';
+import type { HubToastContainerComponent } from '../components/toast-container/toast-container.component';
 import type { HubToastConfig, HubToastData, HubToastRef, HubToastType } from '../models/toast.types';
-import { ToastConfigService } from './toast-config.service';
+import { HubToastConfigService } from './toast-config.service';
 
 /** Monotonically increasing id counter. */
 let nextId = 0;
@@ -17,7 +17,7 @@ let nextId = 0;
  *
  * @example
  * ```typescript
- * constructor(private toastr: ToastService) {}
+ * constructor(private toastr: HubToastService) {}
  *
  * save() {
  *   this.toastr.success('Record saved', 'Success');
@@ -25,8 +25,8 @@ let nextId = 0;
  * ```
  */
 @Injectable({ providedIn: 'root' })
-export class ToastService {
-	private readonly _config = inject(ToastConfigService);
+export class HubToastService {
+	private readonly _config = inject(HubToastConfigService);
 	private readonly _appRef = inject(ApplicationRef);
 
 	/** Read-only signal of all currently active toasts. */
@@ -38,7 +38,7 @@ export class ToastService {
 	 * toast on screen, so opening a notification in another corner moved the ones
 	 * the user was already reading.
 	 */
-	private readonly _containers = new Map<string, ComponentRef<ToastContainerComponent>>();
+	private readonly _containers = new Map<string, ComponentRef<HubToastContainerComponent>>();
 
 	/** Positions whose container is being imported; guards against a double mount. */
 	private readonly _mountingPositions = new Set<string>();
@@ -231,7 +231,7 @@ export class ToastService {
 	}
 
 	/**
-	 * Lazily mounts the `ToastContainerComponent` that owns `position`, via Angular's
+	 * Lazily mounts the `HubToastContainerComponent` that owns `position`, via Angular's
 	 * `createComponent`. Called on every toast — a position already mounted, or already
 	 * being imported, is a no-op. Containers are kept once created: they are inert while
 	 * empty, and re-creating one would cost a fresh import on the next toast of that corner.
@@ -244,7 +244,7 @@ export class ToastService {
 		}
 		this._mountingPositions.add(position);
 
-		import('../components/toast-container/toast-container.component').then(({ ToastContainerComponent }) => {
+		import('../components/toast-container/toast-container.component').then(({ HubToastContainerComponent }) => {
 			this._mountingPositions.delete(position);
 			// The dynamic import resolves on a later microtask, by which time the application may
 			// already be gone — a toast raised just before teardown, a destroyed TestBed, an HMR
@@ -253,7 +253,7 @@ export class ToastService {
 				return;
 			}
 
-			const ref = createComponent(ToastContainerComponent, {
+			const ref = createComponent(HubToastContainerComponent, {
 				environmentInjector: this._appRef.injector
 			});
 			ref.setInput('position', position);

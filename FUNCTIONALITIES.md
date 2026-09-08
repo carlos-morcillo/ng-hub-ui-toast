@@ -4,7 +4,7 @@ This table details the functionalities of the `ng-hub-ui-toast` library and indi
 
 "Example Covered" means something a reader of the documentation page can actually operate demonstrates it: an example **registered on the page**, a **playground control**, or the live demo in the **Mixins** tab. A source file that exists but is not reachable from the page does not count, and neither does a code snippet in the README.
 
-## Service (`ToastService`)
+## Service (`HubToastService`)
 
 | Category | Functionality | Example Covered |
 | :--- | :--- | :---: |
@@ -39,8 +39,8 @@ This table details the functionalities of the `ng-hub-ui-toast` library and indi
 | **Providers** | `provideToast(config?)` global defaults | ❌ |
 | | `HUB_TOAST_CONFIG` token provided directly | ❌ |
 | | `HUB_TOAST_DEFAULT_CONFIG` export | ❌ |
-| | `ToastConfigService.defaults` | ✅ |
-| | `ToastConfigService.resolve()` | ❌ |
+| | `HubToastConfigService.defaults` | ✅ |
+| | `HubToastConfigService.resolve()` | ❌ |
 | **Timing** | `timeOut` (`0` = persistent) | ✅ |
 | | `extendedTimeOut` on hover | ❌ |
 | | `disableTimeOut` (`true` / `'timeOut'` / `'extendedTimeOut'`) | ❌ |
@@ -62,7 +62,7 @@ an element and a new one cannot relocate those already on screen.
 
 | Category | Functionality | Example Covered |
 | :--- | :--- | :---: |
-| **Container** | Two corners open at once keep independent stacks (`ToastContainerComponent.position`) | ✅ |
+| **Container** | Two corners open at once keep independent stacks (`HubToastContainerComponent.position`) | ✅ |
 | **Top** | `toast-top-right` (default) | ✅ |
 | | `toast-top-left` | ✅ |
 | | `toast-top-center` | ✅ |

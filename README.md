@@ -81,11 +81,11 @@ export const appConfig: ApplicationConfig = {
 ### 3. Inject and call
 
 ```typescript
-import { ToastService } from 'ng-hub-ui-toast';
+import { HubToastService } from 'ng-hub-ui-toast';
 
 @Component({ ... })
 export class SaveComponent {
-    private toast = inject(ToastService);
+    private toast = inject(HubToastService);
 
     save() {
         this.toast.success('Record saved.', 'Success');
@@ -97,12 +97,12 @@ export class SaveComponent {
 
 ## 📦 Description
 
-`ng-hub-ui-toast` is a notification service for Angular 21+ standalone apps whose only non-Angular peer is `ng-hub-ui-utils`. Call `ToastService.success()`, `.error()`, `.warning()` or `.info()` from any component or service; the overlay container for a corner is lazily mounted the first time a notification asks for it, so each position keeps its own stack. Each call returns a `HubToastRef` with `onShown`, `onHidden` and `onTap` observables plus `manualClose()` / `resetTimeout()`.
+`ng-hub-ui-toast` is a notification service for Angular 21+ standalone apps whose only non-Angular peer is `ng-hub-ui-utils`. Call `HubToastService.success()`, `.error()`, `.warning()` or `.info()` from any component or service; the overlay container for a corner is lazily mounted the first time a notification asks for it, so each position keeps its own stack. Each call returns a `HubToastRef` with `onShown`, `onHidden` and `onTap` observables plus `manualClose()` / `resetTimeout()`.
 
 ## 🎯 Features
 
 - **Signal-driven stack** — the active-toast list is a `signal<HubToastData[]>`; works with `OnPush` and zoneless apps.
-- **Lazy container mounting, one per position** — a `ToastContainerComponent` is appended to `document.body` the first time a toast asks for that corner; nothing runs at startup, and a notification opened in one corner never moves the ones already showing in another.
+- **Lazy container mounting, one per position** — a `HubToastContainerComponent` is appended to `document.body` the first time a toast asks for that corner; nothing runs at startup, and a notification opened in one corner never moves the ones already showing in another.
 - **`HubToastRef`** — lifecycle observables (`onShown`, `onHidden`, `onTap`), imperative control (`manualClose()`, `resetTimeout()`) and a `dropped` flag that says whether the notification was shown at all.
 - **Per-call config overrides** — set defaults globally with `provideToast()` and override any option individually per call.
 - **Six positions** — top/bottom × right/left/center, each with its own container and its own stack.
@@ -143,16 +143,16 @@ All options are optional and merge over the built-in defaults.
 
 | Export | Kind | Purpose |
 |---|---|---|
-| `ToastService` | service | Imperative entry point: `success()`, `error()`, `warning()`, `info()`, `show()`, `remove()`, `clear()` and the `toasts` signal. |
+| `HubToastService` | service | Imperative entry point: `success()`, `error()`, `warning()`, `info()`, `show()`, `remove()`, `clear()` and the `toasts` signal. |
 | `provideToast(config?)` | provider function | Registers the library and sets the global defaults. |
-| `ToastConfigService` | service | Resolves one toast's config (built-in defaults ← `provideToast()` override ← per-call override). Injected by `ToastService`; inject it yourself to read `defaults`. |
+| `HubToastConfigService` | service | Resolves one toast's config (built-in defaults ← `provideToast()` override ← per-call override). Injected by `HubToastService`; inject it yourself to read `defaults`. |
 | `HUB_TOAST_CONFIG` | `InjectionToken<Partial<HubToastConfig>>` | The token `provideToast()` fills. Provide it directly when the defaults come from somewhere else (a route provider, a factory). |
 | `HUB_TOAST_DEFAULT_CONFIG` | `HubToastConfig` | The built-in defaults, exported so you can read or spread them. |
-| `ToastComponent` | component (`hub-toast`) | Renders a single toast. Instantiated by the container — exported for tests and for rendering a toast outside the overlay. |
-| `ToastContainerComponent` | component (`hub-toast-container`) | The overlay stack of ONE position, named by its `position` input (default `'toast-top-right'`). `ToastService` mounts one on `document.body` per position in use; never declared in a user template. |
+| `HubToastComponent` | component (`hub-toast`) | Renders a single toast. Instantiated by the container — exported for tests and for rendering a toast outside the overlay. |
+| `HubToastContainerComponent` | component (`hub-toast-container`) | The overlay stack of ONE position, named by its `position` input (default `'toast-top-right'`). `HubToastService` mounts one on `document.body` per position in use; never declared in a user template. |
 | `HubToastRef`, `HubToastConfig`, `HubToastType`, `HubToastData`, `HubToastPosition` | types | The public type surface. |
 
-### `ToastService`
+### `HubToastService`
 
 | Method | Signature | Description |
 |---|---|---|
@@ -346,6 +346,7 @@ hub-toast[data-type='offline'] {
 {
     "@angular/common": ">=21.0.0",
     "@angular/core": ">=21.0.0",
+    "ng-hub-ui-ds": ">=22.0.0",
     "ng-hub-ui-utils": ">=22.7.0"
 }
 ```
@@ -353,6 +354,11 @@ hub-toast[data-type='offline'] {
 `ng-hub-ui-utils` is where `resolveHubAccent()` lives, which the toast uses to resolve a
 custom `type` into an accent colour. `ng add ng-hub-ui` installs it for you; a manual
 `npm install` has to add it explicitly.
+
+`ng-hub-ui-ds` is **optional**: install it to give the toast the shared `--hub-sys-*` token
+palette and dark mode. Without it every token read falls back to a built-in default, so a
+`success` toast is still green — just green from this package rather than from the design
+system.
 
 ---
 

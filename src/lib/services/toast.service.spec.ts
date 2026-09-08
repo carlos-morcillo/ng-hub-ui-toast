@@ -1,17 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { firstValueFrom } from 'rxjs';
-import { ToastService } from './toast.service';
+import { HubToastService } from './toast.service';
 import { provideToast } from './toast-config.service';
 
-describe('ToastService', () => {
-	let service: ToastService;
+describe('HubToastService', () => {
+	let service: HubToastService;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			providers: [provideToast(), provideAnimationsAsync()]
 		});
-		service = TestBed.inject(ToastService);
+		service = TestBed.inject(HubToastService);
 	});
 
 	afterEach(async () => {

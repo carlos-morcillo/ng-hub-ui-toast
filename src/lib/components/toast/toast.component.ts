@@ -31,8 +31,8 @@ const BUILT_IN_TYPES = new Set<string>(['success', 'error', 'warning', 'info']);
 		'(click)': 'onTap()'
 	}
 })
-export class ToastComponent implements OnDestroy {
-	/** Toast data provided by `ToastContainerComponent`. */
+export class HubToastComponent implements OnDestroy {
+	/** Toast data provided by `HubToastContainerComponent`. */
 	readonly data = input.required<HubToastData>();
 
 	/** Emits the toast id when this toast should be dismissed. */

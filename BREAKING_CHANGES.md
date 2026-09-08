@@ -1,5 +1,54 @@
 # Breaking Changes — ng-hub-ui-toast
 
+## [22.11.0] - 2026-09-08
+
+### The four exported classes are renamed with the `Hub` prefix
+
+- **Change**: `ToastService` is now `HubToastService`, `ToastConfigService` is
+  `HubToastConfigService`, `ToastComponent` is `HubToastComponent` and `ToastContainerComponent`
+  is `HubToastContainerComponent`. Only the exported names move: the classes are the same
+  objects, the selectors are unchanged, and `provideToast()`, `HUB_TOAST_CONFIG`,
+  `HUB_TOAST_DEFAULT_CONFIG` and every type keep the names they had.
+
+- **Why**: `ToastService` is the single most predictable name an application can give its own
+  notification wrapper, and a library that claims it takes a name that was never the library's to
+  take. The moment a consumer writes one, the file importing both has two bindings on one
+  identifier and has to alias its way out of a collision it did not create. This is not
+  hypothetical for a package whose whole surface was unprefixed while the rest of the family —
+  `HubToastConfig`, `HubToastRef`, `HubToastPosition` — already carried the prefix, so the types
+  and the classes they belong to were spelled by two different conventions in the same import
+  list.
+
+- **What happens if you do nothing**: today, nothing. All four old names are still exported as
+  `@deprecated` aliases resolving to the very same classes, so imports keep compiling, injection
+  keeps resolving — `inject(ToastService)` and `inject(HubToastService)` name one class, and the
+  same singleton — and a provider written as `{ provide: ToastService, useClass: … }` still
+  overrides it. They are removed in **23.0.0**, the release that moves this family to Angular 23,
+  and that is the version where the import stops compiling.
+
+- **Migration**: rename the imports and the injections.
+
+    ```ts
+    // Before
+    import { ToastService } from 'ng-hub-ui-toast';
+
+    export class OrdersComponent {
+    	private readonly toastr = inject(ToastService);
+    }
+
+    // After
+    import { HubToastService } from 'ng-hub-ui-toast';
+
+    export class OrdersComponent {
+    	private readonly toastr = inject(HubToastService);
+    }
+    ```
+
+    A test double or a wrapper that provides its own implementation must move to the new class as
+    its token in the same edit, since a provider keyed on the alias and an `inject(HubToastService)`
+    in library code still meet — they are the same class — but a codebase left half-renamed reads
+    as though they might not.
+
 ## [22.10.0] - 2026-09-07
 
 ### `HubToastRef` requires a `dropped` boolean

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ComponentRef, signal } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { Subject } from 'rxjs';
-import { ToastComponent } from './toast.component';
+import { HubToastComponent } from './toast.component';
 import { HubToastData } from '../../models/toast.types';
 import { HUB_TOAST_DEFAULT_CONFIG } from '../../services/toast-config.service';
 
@@ -21,18 +21,18 @@ function makeToastData(overrides: Partial<HubToastData> = {}): HubToastData {
 	};
 }
 
-describe('ToastComponent', () => {
-	let component: ToastComponent;
-	let componentRef: ComponentRef<ToastComponent>;
-	let fixture: ComponentFixture<ToastComponent>;
+describe('HubToastComponent', () => {
+	let component: HubToastComponent;
+	let componentRef: ComponentRef<HubToastComponent>;
+	let fixture: ComponentFixture<HubToastComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [ToastComponent],
+			imports: [HubToastComponent],
 			providers: [provideAnimationsAsync()]
 		}).compileComponents();
 
-		fixture = TestBed.createComponent(ToastComponent);
+		fixture = TestBed.createComponent(HubToastComponent);
 		component = fixture.componentInstance;
 		componentRef = fixture.componentRef;
 	});
